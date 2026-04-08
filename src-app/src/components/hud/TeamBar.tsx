@@ -1,0 +1,97 @@
+import { useState, useRef } from 'react';
+import type { PokemonInstance } from '@/types/pokemon';
+import { TeamHoverCard } from './TeamHoverCard';
+
+interface TeamBarProps {
+  team: PokemonInstance[];
+  readonly?: boolean;
+  onReorder?: (from: number, to: number) => void;
+}
+
+function hpDotColor(current: number, max: number): string {
+  if (max === 0) return '#dc2626';
+  const pct = current / max;
+  if (pct > 0.5) return '#22c55e';
+  if (pct > 0.2) return '#f59e0b';
+  return '#dc2626';
+}
+
+export function TeamBar({ team, readonly: isReadonly = false, onReorder }: TeamBarProps) {
+  const [hovered, setHovered]       = useState<{ pokemon: PokemonInstance; anchor: { x: number; y: number } } | null>(null);
+  const [dragFrom, setDragFrom]     = useState<number | null>(null);
+  const containerRef                 = useRef<HTMLDivElement>(null);
+
+  const slots = Array.from({ length: 6 }, (_, i) => team[i] ?? null);
+
+  function handleMouseEnter(pokemon: PokemonInstance, e: React.MouseEvent) {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setHovered({ pokemon, anchor: { x: rect.left + rect.width / 2, y: rect.top } });
+  }
+
+  function handleDragStart(idx: number) {
+    if (isReadonly) return;
+    setDragFrom(idx);
+  }
+
+  function handleDrop(idx: number) {
+    if (isReadonly || dragFrom === null || dragFrom === idx) return;
+    onReorder?.(dragFrom, idx);
+    setDragFrom(null);
+  }
+
+  return (
+    <>
+      <div
+        ref={containerRef}
+        className="flex flex-row gap-1"
+        onMouseLeave={() => setHovered(null)}
+      >
+        {slots.map((pokemon, i) => (
+          <div
+            key={i}
+            className={[
+              'flex flex-col items-center gap-0.5 p-1 border-2',
+              pokemon ? 'border-white/40' : 'border-white/10 bg-[#1e2433]',
+              !isReadonly && pokemon ? 'cursor-grab' : '',
+            ].join(' ')}
+            style={{ width: 44, minHeight: 44 }}
+            draggable={!isReadonly && !!pokemon}
+            onDragStart={() => handleDragStart(i)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => handleDrop(i)}
+            onMouseEnter={pokemon ? (e) => handleMouseEnter(pokemon, e) : undefined}
+          >
+            {pokemon ? (
+              <>
+                <img
+                  src={pokemon.spriteUrl}
+                  alt={pokemon.nickname ?? pokemon.name}
+                  width={32}
+                  height={32}
+                  style={{
+                    imageRendering: 'pixelated',
+                    filter: pokemon.currentHp <= 0 ? 'grayscale(1)' : 'none',
+                  }}
+                />
+                {/* HP indicator dot */}
+                <div
+                  className="w-2 h-2 border border-black"
+                  style={{
+                    backgroundColor: pokemon.currentHp <= 0 ? '#555' : hpDotColor(pokemon.currentHp, pokemon.maxHp),
+                  }}
+                />
+              </>
+            ) : (
+              <div className="w-8 h-8 opacity-20 border border-white/20" />
+            )}
+          </div>
+        ))}
+      </div>
+
+      <TeamHoverCard
+        pokemon={hovered?.pokemon ?? null}
+        anchor={hovered?.anchor ?? null}
+      />
+    </>
+  );
+}

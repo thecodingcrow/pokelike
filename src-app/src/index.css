@@ -358,6 +358,19 @@
     .text-neon-green { color: #22c55e; text-shadow: 0 0 8px #22c55e, 0 0 16px #22c55e60; }
 }
 
+/* ── Shiny sparkle effect ───────────────────────────────────────────────── */
+.shiny-sparkle { position: relative; }
+.shiny-sparkle::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle, rgba(248,208,48,0.4) 0%, transparent 70%);
+  animation: shiny-pulse 1.5s steps(4, end) infinite;
+  pointer-events: none;
+}
+@keyframes shiny-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.95); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
 /* ── Reduced motion ─────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
     * {
