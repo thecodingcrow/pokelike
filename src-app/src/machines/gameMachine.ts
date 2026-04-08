@@ -29,6 +29,14 @@ import { GYM_LEADERS } from '@/data/gymLeaders';
 
 import { runBattle, applyLevelGain } from '@/systems/battle';
 import { fetchPokemonById, createInstance } from '@/systems/pokeapi';
+import { checkAndEvolveTeam } from '@/systems/evolution';
+import {
+  generateCatchChoices,
+  generateItemChoices,
+  generateTradeOffer,
+  generateShinyPokemon,
+  generateEnemyTeam,
+} from '@/systems/encounters';
 
 // ── Context ───────────────────────────────────────────────────────────────────
 
@@ -169,6 +177,10 @@ export const gameMachine = setup({
 
     isEliteFourComplete: ({ context }: { context: MachineContext }) =>
       !!(context.battleResult?.eliteComplete),
+
+    /** True when we beat an Elite Four member but have not beaten all of them yet. */
+    isEliteFourNotComplete: ({ context }: { context: MachineContext }) =>
+      !!(context.isBoss && context.isEliteFour && context.battleResult?.playerWon && !context.battleResult?.eliteComplete),
 
     teamIsFull: ({ context }: { context: MachineContext }) =>
       context.teamFull,
@@ -325,8 +337,45 @@ export const gameMachine = setup({
       useUIStore.getState().openModal(event.modal, event.props);
     },
 
+    openMoveTutorAction: () => {
+      useUIStore.getState().openModal('move-tutor');
+    },
+
     closeModalAction: () => {
       useUIStore.getState().closeModal();
+    },
+
+    /**
+     * Handle catching a Pokémon from a catch/shiny/legendary node.
+     * Reads the chosen Pokémon from event.pokemon and adds it to the team.
+     * Also marks the species as caught in the Pokédex.
+     */
+    catchPokemonAction: ({ event }: { event: MachineEvents }) => {
+      if (event.type !== 'MAKE_CHOICE') return;
+      const pokemon = event.pokemon;
+      if (!pokemon) return;
+
+      const gameStore = useGameStore.getState();
+      const persist = usePersistenceStore.getState();
+
+      gameStore.addToTeam(pokemon);
+
+      const normalUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.speciesId}.png`;
+      persist.markCaught(pokemon.speciesId, pokemon.name, pokemon.types, normalUrl);
+
+      if (pokemon.isShiny) {
+        persist.markShinyCaught(pokemon.speciesId, pokemon.name, pokemon.types, pokemon.spriteUrl);
+      }
+    },
+
+    /**
+     * Add a chosen item to the player's bag.
+     */
+    pickItemAction: ({ event }: { event: MachineEvents }) => {
+      if (event.type !== 'MAKE_CHOICE') return;
+      const item = event.item;
+      if (!item) return;
+      useGameStore.getState().addItem(item);
     },
   },
 
@@ -421,14 +470,13 @@ export const gameMachine = setup({
         battleTitle = `Gym Battle vs ${leader.name}!`;
         battleSubtitle = `${leader.badge} is on the line!`;
       } else {
-        // Wild / trainer battle — generate a random enemy team based on current map
-        const enemyLevel = 5 + currentMap * 5 + Math.floor(Math.random() * 5);
-        const enemyId = Math.floor(Math.random() * 151) + 1;
-        const species = await fetchPokemonById(enemyId);
-        if (species) {
-          enemyTeam = [createInstance(species, enemyLevel, false, currentNode?.type === 'trainer' ? 1 : 0)];
-        } else {
-          // Ultra-fallback: just use a generic Rattata-like placeholder
+        // Wild / trainer battle — generate a scaled enemy team using encounters system
+        const nodeType = (currentNode?.type ?? 'battle') as NodeType;
+        enemyTeam = await generateEnemyTeam(currentMap, nodeType);
+
+        // Ultra-fallback if PokeAPI is unavailable
+        if (enemyTeam.length === 0) {
+          const enemyLevel = 5 + currentMap * 5 + Math.floor(Math.random() * 5);
           enemyTeam = [{
             speciesId: 19,
             name: 'Rattata',
@@ -445,6 +493,7 @@ export const gameMachine = setup({
             moveTier: 0 as 0 | 1 | 2,
           }];
         }
+
         battleTitle = currentNode?.type === 'trainer' ? 'Trainer Battle!' : 'Wild Encounter!';
         battleSubtitle = `Map ${currentMap + 1}`;
       }
@@ -458,6 +507,15 @@ export const gameMachine = setup({
         const isWild = !isBoss && !isEliteFour && currentNode?.type !== 'trainer';
         const baseGain = isWild ? 1 : (hardMode ? 1 : 2);
         applyLevelGain(result.pTeam, baseGain, result.playerParticipants, items, isWild, hardMode);
+
+        // Check for and silently apply evolutions (Eevee excluded, handled via modal)
+        const evoResults = await checkAndEvolveTeam(result.pTeam);
+        if (evoResults.length > 0) {
+          for (const evo of evoResults) {
+            result.pTeam[evo.teamIndex] = evo.evolved;
+          }
+        }
+
         gameStore.setTeam(result.pTeam);
       } else {
         gameStore.setTeam(result.pTeam);
@@ -481,6 +539,31 @@ export const gameMachine = setup({
      */
     playBattleAnimation: fromPromise<void, PlayBattleAnimationInput>(async ({ input: _input }) => {
       return;
+    }),
+
+    /** Fetch 3 Pokémon choices for the catch screen. */
+    fetchCatchChoices: fromPromise<PokemonInstance[], Record<string, never>>(async () => {
+      const { currentMap } = useGameStore.getState();
+      return generateCatchChoices(currentMap);
+    }),
+
+    /** Fetch 2 item choices for the item screen. */
+    fetchItemChoices: fromPromise<Item[], Record<string, never>>(async () => {
+      const { currentMap, items } = useGameStore.getState();
+      return generateItemChoices(currentMap, items);
+    }),
+
+    /** Fetch a trade offer Pokémon. */
+    fetchTradeOffer: fromPromise<PokemonInstance | null, Record<string, never>>(async () => {
+      const { currentMap, team } = useGameStore.getState();
+      const givenLevel = team[0]?.level ?? 5;
+      return generateTradeOffer(currentMap, givenLevel);
+    }),
+
+    /** Fetch a shiny Pokémon for the shiny encounter screen. */
+    fetchShinyPokemon: fromPromise<PokemonInstance | null, Record<string, never>>(async () => {
+      const { currentMap } = useGameStore.getState();
+      return generateShinyPokemon(currentMap);
     }),
   },
 }).createMachine({
@@ -570,7 +653,7 @@ export const gameMachine = setup({
         {
           guard: 'isMoveTutorNode',
           target: 'map',
-          actions: 'openModalAction',
+          actions: ['advanceCurrentNodeAction', 'openMoveTutorAction'],
         },
         { guard: 'isBossNode',      target: 'battle' },
         { guard: 'isBattleNode',    target: 'battle' },
@@ -641,6 +724,11 @@ export const gameMachine = setup({
               actions: 'saveHallOfFameAction',
             },
             {
+              guard: 'isEliteFourNotComplete',
+              target: '#game.transition',
+              actions: 'setTransitionMessages',
+            },
+            {
               guard: 'isBossBattle',
               target: '#game.badge',
               actions: 'addBadgeAction',
@@ -658,15 +746,26 @@ export const gameMachine = setup({
 
     // ── Catch screen ──────────────────────────────────────────────────────────
     catch: {
+      invoke: {
+        src: 'fetchCatchChoices',
+        input: {} as Record<string, never>,
+        onDone: {
+          actions: assign({ choices: ({ event }) => (event as { output: PokemonInstance[] }).output }),
+        },
+        onError: {
+          actions: [],
+        },
+      },
       on: {
         MAKE_CHOICE: [
           {
             guard: 'teamIsFull',
             target: 'swap',
+            actions: 'catchPokemonAction',
           },
           {
             target: 'map',
-            actions: 'advanceCurrentNodeAction',
+            actions: ['catchPokemonAction', 'advanceCurrentNodeAction'],
           },
         ],
         SKIP: {
@@ -678,10 +777,20 @@ export const gameMachine = setup({
 
     // ── Item screen ───────────────────────────────────────────────────────────
     item: {
+      invoke: {
+        src: 'fetchItemChoices',
+        input: {} as Record<string, never>,
+        onDone: {
+          actions: assign({ choices: ({ event }) => (event as { output: Item[] }).output }),
+        },
+        onError: {
+          actions: [],
+        },
+      },
       on: {
         MAKE_CHOICE: {
           target: 'map',
-          actions: 'advanceCurrentNodeAction',
+          actions: ['pickItemAction', 'advanceCurrentNodeAction'],
         },
         SKIP: {
           target: 'map',
@@ -706,6 +815,21 @@ export const gameMachine = setup({
 
     // ── Trade screen ──────────────────────────────────────────────────────────
     trade: {
+      invoke: {
+        src: 'fetchTradeOffer',
+        input: {} as Record<string, never>,
+        onDone: {
+          actions: assign({
+            choices: ({ event }) => {
+              const pokemon = (event as { output: PokemonInstance | null }).output;
+              return pokemon ? [pokemon] : [];
+            },
+          }),
+        },
+        onError: {
+          actions: [],
+        },
+      },
       on: {
         MAKE_CHOICE: {
           target: 'shiny',
@@ -720,15 +844,31 @@ export const gameMachine = setup({
 
     // ── Shiny / trade reveal screen ───────────────────────────────────────────
     shiny: {
+      invoke: {
+        src: 'fetchShinyPokemon',
+        input: {} as Record<string, never>,
+        onDone: {
+          actions: assign({
+            choices: ({ event }) => {
+              const pokemon = (event as { output: PokemonInstance | null }).output;
+              return pokemon ? [pokemon] : [];
+            },
+          }),
+        },
+        onError: {
+          actions: [],
+        },
+      },
       on: {
         MAKE_CHOICE: [
           {
             guard: 'teamIsFull',
             target: 'swap',
+            actions: 'catchPokemonAction',
           },
           {
             target: 'map',
-            actions: 'advanceCurrentNodeAction',
+            actions: ['catchPokemonAction', 'advanceCurrentNodeAction'],
           },
         ],
         CONTINUE: {
@@ -752,10 +892,11 @@ export const gameMachine = setup({
     },
 
     // ── Elite Four transition interstitial ────────────────────────────────────
+    // setTransitionMessages is called from battle.result (before entering this state).
+    // advanceEliteIndexAction increments eliteIndex so the next battle uses the next Elite member.
     transition: {
       entry: [
         'advanceEliteIndexAction',
-        'setTransitionMessages',
       ],
       after: {
         2000: {
