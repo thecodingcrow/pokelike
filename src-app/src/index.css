@@ -1,0 +1,368 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Geist Variable', sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+
+    /* ── Game color tokens ───────────────────────────────────────────── */
+    --color-game-bg:      #0a0a0f;
+    --color-game-panel:   #121827;
+    --color-game-muted:   #1e2433;
+
+    --color-pokemon-red:    #dc2626;
+    --color-pokemon-blue:   #2563eb;
+    --color-pokemon-green:  #22c55e;
+    --color-pokemon-yellow: #f8d030;
+    --color-pokemon-purple: #7c3aed;
+
+    --color-hp-full:  #22c55e;
+    --color-hp-mid:   #f59e0b;
+    --color-hp-low:   #dc2626;
+
+    --color-type-fire:     #ff7c5c;
+    --color-type-water:    #6ab4f5;
+    --color-type-grass:    #78c850;
+    --color-type-electric: #f8d030;
+    --color-type-psychic:  #f85888;
+    --color-type-normal:   #a8a878;
+    --color-type-ghost:    #705898;
+    --color-type-dragon:   #7038f8;
+    --color-type-ice:      #98d8d8;
+    --color-type-fighting: #c03028;
+    --color-type-poison:   #a040a0;
+    --color-type-ground:   #e0c068;
+    --color-type-flying:   #a890f0;
+    --color-type-bug:      #a8b820;
+    --color-type-rock:     #b8a038;
+    --color-type-dark:     #705848;
+    --color-type-steel:    #b8b8d0;
+
+    /* ── Box shadows ─────────────────────────────────────────────────── */
+    --shadow-pixel:       4px 4px 0px #000000;
+    --shadow-pixel-sm:    2px 2px 0px #000000;
+    --shadow-pixel-lg:    6px 6px 0px #000000;
+    --shadow-pixel-inset: inset 2px 2px 0px #000000;
+    --shadow-pixel-up:    -4px -4px 0px #000000;
+
+    /* ── Font families ───────────────────────────────────────────────── */
+    --font-pixel:    'Press Start 2P', cursive;
+    --font-terminal: 'VT323', monospace;
+    --font-mono:     'JetBrains Mono', monospace;
+
+    /* ── Keyframes ───────────────────────────────────────────────────── */
+    --animate-blink:        blink 0.8s steps(1, end) infinite;
+    --animate-blink-fast:   blink 0.6s steps(1, end) infinite;
+    --animate-damage-shake: damage-shake 300ms steps(6, end);
+    --animate-screen-wipe:  screen-wipe 300ms steps(6, end) forwards;
+    --animate-sprite-enter: sprite-enter 200ms steps(4, end) forwards;
+    --animate-crit-flash:   crit-flash 200ms steps(2, end);
+    --animate-hit-flash:    hit-flash 150ms steps(2, end);
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+@keyframes damage-shake {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-4px); }
+    75%      { transform: translateX(4px); }
+}
+@keyframes screen-wipe {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0); }
+}
+@keyframes sprite-enter {
+    from { transform: translateX(120%); }
+    to   { transform: translateX(0); }
+}
+@keyframes sprite-enter-left {
+    from { transform: translateX(-120%); }
+    to   { transform: translateX(0); }
+}
+@keyframes sprite-enter-right {
+    from { transform: translateX(120%); }
+    to   { transform: translateX(0); }
+}
+@keyframes crit-flash {
+    0%, 100% { filter: brightness(1); }
+    50%      { filter: brightness(2.5); }
+}
+@keyframes hit-flash {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+}
+
+:root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --radius: 0rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+        border-radius: 0 !important;
+    }
+    body {
+        @apply bg-background text-foreground;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+    }
+    html {
+        @apply font-sans;
+    }
+
+    /* Scrollbar — dark pixel style */
+    ::-webkit-scrollbar {
+        width: 8px;
+        background: #0a0a0f;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #ffffff;
+        border: 2px solid #0a0a0f;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #dc2626;
+    }
+}
+
+@layer components {
+    /* ── Pixel button ─────────────────────────────────────────────────── */
+    .btn-pixel {
+        font-family: var(--font-pixel);
+        font-size: 10px;
+        border: 2px solid white;
+        box-shadow: var(--shadow-pixel);
+        cursor: pointer;
+        min-height: 44px;
+        padding: 0 1rem;
+        transition: none;
+    }
+    .btn-pixel:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: var(--shadow-pixel-lg);
+    }
+    .btn-pixel:active {
+        transform: translate(2px, 2px);
+        box-shadow: none;
+    }
+
+    /* ── Game panel ───────────────────────────────────────────────────── */
+    .card-pixel {
+        background: var(--color-game-panel);
+        border: 2px solid white;
+        box-shadow: var(--shadow-pixel);
+        padding: 1rem;
+    }
+
+    /* ── RPG dialog box ───────────────────────────────────────────────── */
+    .dialog-rpg {
+        background: var(--color-game-bg);
+        border-top: 4px solid white;
+        box-shadow: 0 -4px 0 #000;
+        padding: 1.5rem 1.5rem 2rem;
+        font-family: var(--font-terminal);
+        font-size: 22px;
+        color: white;
+        line-height: 1.4;
+        max-height: 30vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* ── HP bar ───────────────────────────────────────────────────────── */
+    .hp-bar-container {
+        border: 2px solid white;
+        height: 0.75rem;
+        background: var(--color-game-muted);
+        box-shadow: var(--shadow-pixel-sm);
+        overflow: hidden;
+    }
+    .hp-bar-fill {
+        height: 100%;
+        transition: width 600ms steps(8, end);
+    }
+
+    /* ── Type badge ───────────────────────────────────────────────────── */
+    .type-badge {
+        font-family: var(--font-pixel);
+        font-size: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.125rem 0.375rem;
+        border: 1px solid white;
+        box-shadow: var(--shadow-pixel-sm);
+        color: white;
+        display: inline-block;
+    }
+
+    /* ── Battle animations ────────────────────────────────────────────── */
+    .damage-shake {
+        animation: damage-shake 300ms steps(6, end);
+    }
+    .sprite-enter-left {
+        animation: sprite-enter-left 200ms steps(4, end) forwards;
+    }
+    .sprite-enter-right {
+        animation: sprite-enter-right 200ms steps(4, end) forwards;
+    }
+    .crit-flash {
+        animation: crit-flash 200ms steps(2, end);
+    }
+    .hit-flash {
+        animation: hit-flash 150ms steps(2, end);
+    }
+
+    /* ── Blink animations ─────────────────────────────────────────────── */
+    .animate-blink {
+        animation: blink 0.8s steps(1, end) infinite;
+    }
+    .animate-blink-fast {
+        animation: blink 0.6s steps(1, end) infinite;
+    }
+    .animate-damage-shake {
+        animation: damage-shake 300ms steps(6, end);
+    }
+
+    /* ── CRT overlay ──────────────────────────────────────────────────── */
+    .crt-overlay {
+        position: relative;
+    }
+    .crt-overlay::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+        pointer-events: none;
+        z-index: 9999;
+    }
+
+    /* ── Neon text ────────────────────────────────────────────────────── */
+    .text-neon-red   { color: #dc2626; text-shadow: 0 0 8px #dc2626, 0 0 16px #dc262660; }
+    .text-neon-blue  { color: #2563eb; text-shadow: 0 0 8px #2563eb, 0 0 16px #2563eb60; }
+    .text-neon-green { color: #22c55e; text-shadow: 0 0 8px #22c55e, 0 0 16px #22c55e60; }
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

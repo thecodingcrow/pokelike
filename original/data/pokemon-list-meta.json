@@ -1,0 +1,28 @@
+{
+  "description": "Full PokeAPI species+forms list cached by pokelike.xyz in localStorage",
+  "total_entries": 1350,
+  "id_range": [1, 1350],
+  "structure": {"name": "string (lowercase, hyphenated)", "id": "number"},
+  "breakdown": {
+    "gen1_base": "1-151",
+    "gen2_base": "152-251", 
+    "gen3_base": "252-386",
+    "gen4_base": "387-493",
+    "gen5_base": "494-649",
+    "gen6_base": "650-721",
+    "gen7_base": "722-809",
+    "gen8_base": "810-898",
+    "gen9_base": "899-1025",
+    "alt_forms": "1026-1350 (deoxys forms, megas, alolan, galarian, hisuian, paldean, gmax, etc.)"
+  },
+  "game_relevant_ids": {
+    "core_gen1": "1-151",
+    "cross_gen_evos": [169, 186, 196, 197, 199, 208, 212, 230, 233, 242],
+    "notes": "Game uses Gen 1 Pokemon (1-151) plus select Gen 2+ evolutions (Steelix=208, Scizor=212, Crobat=169, Espeon=196, Umbreon=197, etc.)"
+  },
+  "sprite_url_template": {
+    "normal": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{id}.png",
+    "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/{id}.png"
+  },
+  "source": "Extracted from pokelike.xyz localStorage, PokeAPI v2 /api/v2/pokemon?limit=1350"
+}
