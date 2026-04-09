@@ -3,33 +3,23 @@ import type { ModalId } from '@/store/uiStore';
 import type { ComponentType } from 'react';
 
 // ── Real modal components ──────────────────────────────────────────────────────
-import { ItemEquipModal }   from '@/components/modals/ItemEquipModal';
-import { UsableItemModal }  from '@/components/modals/UsableItemModal';
-import { MoveTutorModal }   from '@/components/modals/MoveTutorModal';
-import { EeveeChoiceModal } from '@/components/modals/EeveeChoiceModal';
-import { SettingsModal }    from '@/components/modals/SettingsModal';
-
-// ── Placeholder factory ────────────────────────────────────────────────────────
-function ModalPlaceholder(name: string): ComponentType {
-  return function PlaceholderModal() {
-    return (
-      <div className="bg-[#121827] border-2 border-white shadow-[4px_4px_0px_#000] p-6 min-w-[240px]">
-        <div className="font-pixel text-[10px] text-white text-center">{name}</div>
-        <div className="font-terminal text-[16px] text-[#94a3b8] text-center mt-2">
-          Coming soon
-        </div>
-      </div>
-    );
-  };
-}
+import { ItemEquipModal }      from '@/components/modals/ItemEquipModal';
+import { UsableItemModal }     from '@/components/modals/UsableItemModal';
+import { MoveTutorModal }      from '@/components/modals/MoveTutorModal';
+import { EeveeChoiceModal }    from '@/components/modals/EeveeChoiceModal';
+import { SettingsModal }       from '@/components/modals/SettingsModal';
+import { PokedexModal }        from '@/components/modals/PokedexModal';
+import { AchievementsModal }   from '@/components/modals/AchievementsModal';
+import { HallOfFameModal }     from '@/components/modals/HallOfFameModal';
+import { PatchNotesModal }     from '@/components/modals/PatchNotesModal';
 
 // ── Modal map ─────────────────────────────────────────────────────────────────
 const MODAL_MAP: Record<Exclude<ModalId, null>, ComponentType> = {
-  'pokedex':       ModalPlaceholder('POKEDEX'),
-  'achievements':  ModalPlaceholder('ACHIEVEMENTS'),
+  'pokedex':       PokedexModal,
+  'achievements':  AchievementsModal,
   'settings':      SettingsModal,
-  'hall-of-fame':  ModalPlaceholder('HALL OF FAME'),
-  'patch-notes':   ModalPlaceholder('PATCH NOTES'),
+  'hall-of-fame':  HallOfFameModal,
+  'patch-notes':   PatchNotesModal,
   'item-equip':    ItemEquipModal,
   'usable-item':   UsableItemModal,
   'move-tutor':    MoveTutorModal,
