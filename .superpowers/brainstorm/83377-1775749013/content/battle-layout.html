@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokelike — Battle Screen Layout</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0d110e; color:#f0ead6; font-family:VT323,monospace; }
+
+  .title { font-family:'Press Start 2P',monospace; font-size:12px; color:#c8a96e; text-align:center; padding:24px 16px 6px; }
+  .subtitle { font-size:20px; color:#8a7a5a; text-align:center; padding:0 16px 24px; }
+
+  .wireframe { max-width:900px; margin:0 auto 40px; border:2px solid #3a4a30; background:#0a0e0a; position:relative; overflow:hidden; }
+  .wf-label { position:absolute; top:8px; right:12px; font-size:13px; color:#5a6a50; z-index:10; }
+  .wf-title { font-family:'Press Start 2P',monospace; font-size:9px; color:#c8a96e; padding:12px 16px 4px; }
+  .wf-desc { font-size:17px; color:#8a7a5a; padding:0 16px 12px; }
+
+  /* Pokemon slot */
+  .poke-slot { display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .poke-sprite { width:64px; height:64px; background:#1a2418; border:1.5px solid #5a6a4a; display:flex; align-items:center; justify-content:center; font-size:28px; image-rendering:pixelated; position:relative; }
+  .poke-sprite-active { border-color:#c8a96e; box-shadow: 0 0 8px rgba(200,169,110,0.3); }
+  .poke-sprite-fainted { opacity:0.3; filter:grayscale(0.8); }
+  .poke-name { font-family:'Press Start 2P',monospace; font-size:6px; color:#f0ead6; max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; }
+  .poke-level { font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a7a5a; }
+  .hp-bar { width:56px; height:5px; background:#1a2a18; border:1px solid #3a4a30; overflow:hidden; }
+  .hp-fill { height:100%; }
+  .hp-g { background:#4a8a40; }
+  .hp-y { background:#c8a020; }
+  .hp-r { background:#a04040; }
+  .hp-0 { width:0; }
+
+  .active-label { font-size:8px; color:#c8a96e; font-family:'Press Start 2P',monospace; letter-spacing:1px; }
+  .vs-divider { font-family:'Press Start 2P',monospace; font-size:14px; color:#5a4a30; }
+
+  .dialog-box { background:rgba(10,14,10,0.95); border-top:3px solid #c8a96e; padding:10px 16px; }
+  .dialog-text { font-size:20px; color:#f0ead6; }
+  .dialog-cursor { color:#c8a96e; animation:blink 0.8s steps(1) infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .btn-sm { font-family:VT323,monospace; font-size:15px; padding:3px 10px; border:1.5px solid #c8a96e; background:linear-gradient(180deg,#4a3a18,#2a1a08); color:#f0ead6; box-shadow:0 1px 0 #2a1a00; cursor:pointer; }
+
+  .note { max-width:900px; margin:0 auto 24px; padding:12px 16px; border:1px solid #3a4a30; background:rgba(14,18,12,0.3); font-size:17px; color:#8a7a5a; }
+  .note strong { color:#c8a96e; }
+</style>
+</head>
+<body>
+
+<div class="title">BATTLE SCREEN — BOTH TEAMS VISIBLE</div>
+<p class="subtitle">Auto-battle roguelike. No move selection. Both full rosters shown. Active Pokemon highlighted. Works for wild (1v1) and trainer (3v5).</p>
+
+<!-- ══════════ TRAINER BATTLE (5v3) ══════════ -->
+<div class="wireframe" style="padding:0;">
+  <span class="wf-label">TRAINER BATTLE (5v3)</span>
+  <div class="wf-title">VS BROCK — GYM LEADER</div>
+
+  <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:12px; padding:12px 20px; align-items:start;">
+
+    <!-- YOUR TEAM (left) -->
+    <div>
+      <div class="active-label" style="margin-bottom:6px;">YOUR TEAM</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <!-- Active (first alive) -->
+        <div class="poke-slot">
+          <div class="poke-sprite poke-sprite-active">🐸</div>
+          <div class="poke-name">BULBASAUR</div>
+          <div class="poke-level">Lv 8</div>
+          <div class="hp-bar"><div class="hp-fill hp-g" style="width:72%;"></div></div>
+        </div>
+        <div class="poke-slot">
+          <div class="poke-sprite">🐛</div>
+          <div class="poke-name">CATERPIE</div>
+          <div class="poke-level">Lv 5</div>
+          <div class="hp-bar"><div class="hp-fill hp-g" style="width:100%;"></div></div>
+        </div>
+        <div class="poke-slot">
+          <div class="poke-sprite">🐦</div>
+          <div class="poke-name">PIDGEY</div>
+          <div class="poke-level">Lv 6</div>
+          <div class="hp-bar"><div class="hp-fill hp-g" style="width:100%;"></div></div>
+        </div>
+        <!-- Empty slots -->
+        <div class="poke-slot">
+          <div class="poke-sprite" style="opacity:0.2; border-style:dashed;"></div>
+        </div>
+        <div class="poke-slot">
+          <div class="poke-sprite" style="opacity:0.2; border-style:dashed;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VS -->
+    <div style="display:flex; align-items:center; padding-top:40px;">
+      <div class="vs-divider">VS</div>
+    </div>
+
+    <!-- ENEMY TEAM (right) -->
+    <div style="text-align:right;">
+      <div class="active-label" style="margin-bottom:6px; text-align:right;">BROCK'S TEAM</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end;">
+        <div class="poke-slot">
+          <div class="poke-sprite poke-sprite-active" style="border-color:#a05040; box-shadow:0 0 8px rgba(160,80,64,0.3);">🪨</div>
+          <div class="poke-name">GEODUDE</div>
+          <div class="poke-level">Lv 12</div>
+          <div class="hp-bar"><div class="hp-fill hp-y" style="width:45%;"></div></div>
+        </div>
+        <div class="poke-slot">
+          <div class="poke-sprite">🐍</div>
+          <div class="poke-name">ONIX</div>
+          <div class="poke-level">Lv 14</div>
+          <div class="hp-bar"><div class="hp-fill hp-g" style="width:100%;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spotlight: active pokemon face-off -->
+  <div style="display:flex; justify-content:center; align-items:center; gap:40px; padding:8px 20px 16px; border-top:1px solid #2a3a20; border-bottom:1px solid #2a3a20; background:rgba(0,0,0,0.2);">
+    <div style="text-align:center;">
+      <div style="width:96px;height:96px;background:#1a2a18;border:2px solid #c8a96e;display:flex;align-items:center;justify-content:center;font-size:48px;box-shadow:0 0 12px rgba(200,169,110,0.2);">🐸</div>
+      <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#c8a96e;margin-top:4px;">BULBASAUR</div>
+    </div>
+    <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:#3a4a30;">⚔</div>
+    <div style="text-align:center;">
+      <div style="width:96px;height:96px;background:#1a1412;border:2px solid #a05040;display:flex;align-items:center;justify-content:center;font-size:48px;box-shadow:0 0 12px rgba(160,80,64,0.2);">🪨</div>
+      <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#a05040;margin-top:4px;">GEODUDE</div>
+    </div>
+  </div>
+
+  <!-- Dialog + controls -->
+  <div class="dialog-box" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="dialog-text" style="flex:1;">Bulbasaur used Vine Whip! It's super effective! <span class="dialog-cursor">▼</span></div>
+    <div style="display:flex; gap:6px; margin-left:12px;">
+      <div class="btn-sm">⏩ SKIP</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ WILD BATTLE (1v1) ══════════ -->
+<div class="wireframe" style="padding:0;">
+  <span class="wf-label">WILD BATTLE (1v1)</span>
+  <div class="wf-title">WILD POKEMON APPEARED!</div>
+
+  <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:12px; padding:12px 20px; align-items:start;">
+    <!-- Your team -->
+    <div>
+      <div class="active-label" style="margin-bottom:6px;">YOUR TEAM</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <div class="poke-slot">
+          <div class="poke-sprite poke-sprite-active">🐸</div>
+          <div class="poke-name">BULBASAUR</div>
+          <div class="poke-level">Lv 8</div>
+          <div class="hp-bar"><div class="hp-fill hp-g" style="width:90%;"></div></div>
+        </div>
+        <div class="poke-slot">
+          <div class="poke-sprite">🐛</div>
+          <div class="poke-name">CATERPIE</div>
+          <div class="poke-level">Lv 5</div>
+          <div class="hp-bar"><div class="hp-fill hp-g" style="width:100%;"></div></div>
+        </div>
+        <div class="poke-slot">
+          <div class="poke-sprite" style="opacity:0.2;border-style:dashed;"></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;padding-top:40px;"><div class="vs-divider">VS</div></div>
+    <!-- Wild enemy (just 1) -->
+    <div style="text-align:right;">
+      <div class="active-label" style="margin-bottom:6px; text-align:right;">WILD</div>
+      <div style="display:flex; justify-content:flex-end;">
+        <div class="poke-slot">
+          <div class="poke-sprite poke-sprite-active" style="border-color:#a05040; box-shadow:0 0 8px rgba(160,80,64,0.3);">🐀</div>
+          <div class="poke-name">RATTATA</div>
+          <div class="poke-level">Lv 4</div>
+          <div class="hp-bar"><div class="hp-fill hp-r" style="width:15%;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active face-off -->
+  <div style="display:flex; justify-content:center; align-items:center; gap:40px; padding:8px 20px 16px; border-top:1px solid #2a3a20; border-bottom:1px solid #2a3a20; background:rgba(0,0,0,0.2);">
+    <div style="text-align:center;">
+      <div style="width:96px;height:96px;background:#1a2a18;border:2px solid #c8a96e;display:flex;align-items:center;justify-content:center;font-size:48px;">🐸</div>
+    </div>
+    <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:#3a4a30;">⚔</div>
+    <div style="text-align:center;">
+      <div style="width:96px;height:96px;background:#1a1412;border:2px solid #a05040;display:flex;align-items:center;justify-content:center;font-size:48px;">🐀</div>
+    </div>
+  </div>
+
+  <div class="dialog-box" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="dialog-text" style="flex:1;">Wild Rattata is almost down! <span class="dialog-cursor">▼</span></div>
+    <div class="btn-sm">⏩ SKIP</div>
+  </div>
+</div>
+
+<!-- ══════════ MID-BATTLE STATE (fainted pokemon) ══════════ -->
+<div class="wireframe" style="padding:0;">
+  <span class="wf-label">MID-BATTLE (faints shown)</span>
+  <div class="wf-title">VS BROCK — ROUND 4</div>
+
+  <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:12px; padding:12px 20px; align-items:start;">
+    <div>
+      <div class="active-label" style="margin-bottom:6px;">YOUR TEAM</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <!-- Fainted -->
+        <div class="poke-slot">
+          <div class="poke-sprite poke-sprite-fainted">🐸</div>
+          <div class="poke-name" style="color:#5a4a4a;text-decoration:line-through;">BULBASAUR</div>
+          <div class="poke-level" style="color:#5a4a4a;">Lv 9</div>
+          <div class="hp-bar"><div class="hp-fill hp-0"></div></div>
+        </div>
+        <!-- Now active -->
+        <div class="poke-slot">
+          <div class="poke-sprite poke-sprite-active">🐛</div>
+          <div class="poke-name">BUTTERFREE</div>
+          <div class="poke-level">Lv 10</div>
+          <div class="hp-bar"><div class="hp-fill hp-y" style="width:40%;"></div></div>
+        </div>
+        <div class="poke-slot">
+          <div class="poke-sprite">🐦</div>
+          <div class="poke-name">PIDGEY</div>
+          <div class="poke-level">Lv 7</div>
+          <div class="hp-bar"><div class="hp-fill hp-g" style="width:100%;"></div></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;padding-top:40px;"><div class="vs-divider">VS</div></div>
+    <div style="text-align:right;">
+      <div class="active-label" style="text-align:right;margin-bottom:6px;">BROCK</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end;">
+        <!-- Fainted enemy -->
+        <div class="poke-slot">
+          <div class="poke-sprite poke-sprite-fainted" style="border-color:#3a2020;">🪨</div>
+          <div class="poke-name" style="color:#5a4a4a;text-decoration:line-through;">GEODUDE</div>
+          <div class="poke-level" style="color:#5a4a4a;">Lv 12</div>
+          <div class="hp-bar"><div class="hp-fill hp-0"></div></div>
+        </div>
+        <div class="poke-slot">
+          <div class="poke-sprite poke-sprite-active" style="border-color:#a05040;box-shadow:0 0 8px rgba(160,80,64,0.3);">🐍</div>
+          <div class="poke-name">ONIX</div>
+          <div class="poke-level">Lv 14</div>
+          <div class="hp-bar"><div class="hp-fill hp-g" style="width:85%;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; justify-content:center; align-items:center; gap:40px; padding:8px 20px 16px; border-top:1px solid #2a3a20; border-bottom:1px solid #2a3a20; background:rgba(0,0,0,0.2);">
+    <div style="text-align:center;">
+      <div style="width:96px;height:96px;background:#1a2a18;border:2px solid #c8a96e;display:flex;align-items:center;justify-content:center;font-size:48px;">🐛</div>
+    </div>
+    <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:#3a4a30;">⚔</div>
+    <div style="text-align:center;">
+      <div style="width:96px;height:96px;background:#1a1412;border:2px solid #a05040;display:flex;align-items:center;justify-content:center;font-size:48px;">🐍</div>
+    </div>
+  </div>
+
+  <div class="dialog-box" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="dialog-text" style="flex:1;">Onix used Rock Throw! <span class="dialog-cursor">▼</span></div>
+    <div class="btn-sm">⏩ SKIP</div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>Layout structure:</strong><br><br>
+  <strong>Top zone:</strong> Both full rosters side by side. Your team left, enemy right. VS divider. Each pokemon shows sprite + name + level + HP bar. Active = gold/red border + glow. Fainted = grayscale + strikethrough + empty HP. Empty slots = dashed border.<br><br>
+  <strong>Middle zone:</strong> Active pokemon spotlight — large sprites face off. This is where damage animations play (shake, flash).<br><br>
+  <strong>Bottom zone:</strong> Dialogue box with typewriter text + Skip/Continue button. Same across all battle types.<br><br>
+  <strong>Scales naturally:</strong> Wild (1v1) has fewer slots, looks clean. Gym (2v5) fills both sides. Elite Four (5v5) uses all space. No layout changes needed between battle types.
+</div>
+
+</body>
+</html>

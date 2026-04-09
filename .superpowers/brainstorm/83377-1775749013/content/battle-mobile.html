@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokelike — Battle Mobile Layout</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0d110e; color:#f0ead6; font-family:VT323,monospace; }
+
+  .title { font-family:'Press Start 2P',monospace; font-size:12px; color:#c8a96e; text-align:center; padding:24px 16px 6px; }
+  .subtitle { font-size:20px; color:#8a7a5a; text-align:center; padding:0 16px 24px; }
+
+  .phones { display:flex; gap:32px; justify-content:center; flex-wrap:wrap; padding:0 16px 40px; align-items:flex-start; }
+
+  /* Phone frame */
+  .phone { width:320px; border:3px solid #3a4a30; background:#0a0e0a; overflow:hidden; position:relative; flex-shrink:0; }
+  .phone-label { font-family:'Press Start 2P',monospace; font-size:7px; color:#c8a96e; padding:6px 10px; border-bottom:1px solid #2a3a20; display:flex; justify-content:space-between; }
+  .phone-label span:last-child { font-family:VT323,monospace; font-size:13px; color:#5a6a50; }
+
+  /* Battle elements */
+  .m-header { padding:6px 8px; border-bottom:1px solid #2a3a20; display:flex; justify-content:space-between; align-items:center; }
+  .m-header-title { font-family:'Press Start 2P',monospace; font-size:6px; color:#c8a96e; }
+
+  .m-team-strip { display:flex; gap:3px; padding:6px 8px; border-bottom:1px solid #1a2a18; }
+  .m-team-strip-enemy { justify-content:flex-end; border-bottom:none; border-top:1px solid #1a2a18; }
+
+  .m-poke { display:flex; align-items:center; gap:4px; padding:2px 4px; }
+  .m-poke-active { background:rgba(200,169,110,0.1); border:1px solid rgba(200,169,110,0.3); }
+  .m-poke-active-enemy { background:rgba(160,80,64,0.1); border:1px solid rgba(160,80,64,0.3); }
+  .m-poke-fainted { opacity:0.3; }
+  .m-poke-sprite { width:28px; height:28px; background:#1a2418; border:1px solid #3a4a30; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .m-poke-info { display:flex; flex-direction:column; gap:1px; }
+  .m-poke-name { font-family:'Press Start 2P',monospace; font-size:5px; color:#f0ead6; }
+  .m-poke-name-enemy { color:#a05040; }
+  .m-poke-level { font-family:'JetBrains Mono',monospace; font-size:9px; color:#8a7a5a; }
+  .m-hp { width:40px; height:3px; background:#1a2a18; border:1px solid #2a3a20; overflow:hidden; }
+  .m-hp-fill { height:100%; }
+
+  .m-arena { display:flex; justify-content:center; align-items:center; gap:20px; padding:12px 8px; }
+  .m-arena-sprite { width:72px; height:72px; background:#1a2418; border:2px solid #5a6a4a; display:flex; align-items:center; justify-content:center; font-size:32px; }
+  .m-arena-sprite-you { border-color:#c8a96e; box-shadow:0 0 6px rgba(200,169,110,0.2); }
+  .m-arena-sprite-enemy { border-color:#a05040; box-shadow:0 0 6px rgba(160,80,64,0.2); }
+
+  .m-dialog { background:rgba(10,14,10,0.95); border-top:2px solid #c8a96e; padding:6px 10px; display:flex; justify-content:space-between; align-items:center; }
+  .m-dialog-text { font-size:15px; color:#f0ead6; flex:1; }
+  .m-dialog-cursor { color:#c8a96e; animation:blink 0.8s steps(1) infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .m-btn { font-size:12px; padding:2px 6px; border:1px solid #c8a96e; background:#3a2a10; color:#f0ead6; }
+
+  .m-vs { font-family:'Press Start 2P',monospace; font-size:8px; color:#3a4a30; }
+
+  .note { max-width:750px; margin:0 auto 32px; padding:12px 16px; border:1px solid #3a4a30; background:rgba(14,18,12,0.3); font-size:17px; color:#8a7a5a; }
+  .note strong { color:#c8a96e; }
+</style>
+</head>
+<body>
+
+<div class="title">BATTLE — MOBILE LAYOUT</div>
+<p class="subtitle">Same info, stacked vertically. Compact team strips + centered arena + dialog.</p>
+
+<div class="phones">
+
+  <!-- ═══ TRAINER BATTLE 3v5 ═══ -->
+  <div class="phone">
+    <div class="phone-label"><span>TRAINER BATTLE</span><span>375px viewport</span></div>
+
+    <!-- Header -->
+    <div class="m-header">
+      <div class="m-header-title">VS BROCK</div>
+      <div class="m-btn">⏩</div>
+    </div>
+
+    <!-- Enemy team strip (top) -->
+    <div class="m-team-strip m-team-strip-enemy">
+      <div class="m-poke m-poke-active-enemy">
+        <div class="m-poke-sprite" style="border-color:#a05040;">🪨</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name m-poke-name-enemy">GEODUDE</div>
+          <div class="m-poke-level">Lv12</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:45%;background:#c8a020;"></div></div>
+        </div>
+      </div>
+      <div class="m-poke">
+        <div class="m-poke-sprite">🐍</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name" style="color:#8a7a5a;">ONIX</div>
+          <div class="m-poke-level">Lv14</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:100%;background:#4a8a40;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arena -->
+    <div class="m-arena">
+      <div style="text-align:center;">
+        <div class="m-arena-sprite m-arena-sprite-you">🐸</div>
+      </div>
+      <div class="m-vs">⚔</div>
+      <div style="text-align:center;">
+        <div class="m-arena-sprite m-arena-sprite-enemy">🪨</div>
+      </div>
+    </div>
+
+    <!-- Your team strip (bottom, above dialog) -->
+    <div class="m-team-strip">
+      <div class="m-poke m-poke-active">
+        <div class="m-poke-sprite" style="border-color:#c8a96e;">🐸</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name">BULBASAUR</div>
+          <div class="m-poke-level">Lv8</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:72%;background:#4a8a40;"></div></div>
+        </div>
+      </div>
+      <div class="m-poke">
+        <div class="m-poke-sprite">🐛</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name">CATERPIE</div>
+          <div class="m-poke-level">Lv5</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:100%;background:#4a8a40;"></div></div>
+        </div>
+      </div>
+      <div class="m-poke">
+        <div class="m-poke-sprite">🐦</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name">PIDGEY</div>
+          <div class="m-poke-level">Lv6</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:100%;background:#4a8a40;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialog -->
+    <div class="m-dialog">
+      <div class="m-dialog-text">Vine Whip! Super effective! <span class="m-dialog-cursor">▼</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ WILD BATTLE 1v1 ═══ -->
+  <div class="phone">
+    <div class="phone-label"><span>WILD BATTLE</span><span>375px viewport</span></div>
+
+    <div class="m-header">
+      <div class="m-header-title">WILD POKEMON</div>
+      <div class="m-btn">⏩</div>
+    </div>
+
+    <!-- Enemy (just 1) -->
+    <div class="m-team-strip m-team-strip-enemy">
+      <div class="m-poke m-poke-active-enemy">
+        <div class="m-poke-sprite" style="border-color:#a05040;">🐀</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name m-poke-name-enemy">RATTATA</div>
+          <div class="m-poke-level">Lv4</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:15%;background:#a04040;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arena (bigger sprites when less clutter) -->
+    <div class="m-arena" style="padding:20px 8px;">
+      <div class="m-arena-sprite m-arena-sprite-you" style="width:88px;height:88px;font-size:40px;">🐸</div>
+      <div class="m-vs">⚔</div>
+      <div class="m-arena-sprite m-arena-sprite-enemy" style="width:88px;height:88px;font-size:40px;">🐀</div>
+    </div>
+
+    <!-- Your team -->
+    <div class="m-team-strip">
+      <div class="m-poke m-poke-active">
+        <div class="m-poke-sprite" style="border-color:#c8a96e;">🐸</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name">BULBASAUR</div>
+          <div class="m-poke-level">Lv8</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:90%;background:#4a8a40;"></div></div>
+        </div>
+      </div>
+      <div class="m-poke">
+        <div class="m-poke-sprite">🐛</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name">CATERPIE</div>
+          <div class="m-poke-level">Lv5</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:100%;background:#4a8a40;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-dialog">
+      <div class="m-dialog-text">Rattata is almost down! <span class="m-dialog-cursor">▼</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ MID-BATTLE WITH FAINTS ═══ -->
+  <div class="phone">
+    <div class="phone-label"><span>MID-BATTLE (faints)</span><span>375px viewport</span></div>
+
+    <div class="m-header">
+      <div class="m-header-title">VS BROCK</div>
+      <div class="m-btn">⏩</div>
+    </div>
+
+    <!-- Enemy -->
+    <div class="m-team-strip m-team-strip-enemy">
+      <div class="m-poke m-poke-fainted">
+        <div class="m-poke-sprite" style="opacity:0.3;">🪨</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name" style="color:#4a3a3a;text-decoration:line-through;">GEODUDE</div>
+          <div class="m-poke-level" style="color:#4a3a3a;">Lv12</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:0;"></div></div>
+        </div>
+      </div>
+      <div class="m-poke m-poke-active-enemy">
+        <div class="m-poke-sprite" style="border-color:#a05040;">🐍</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name m-poke-name-enemy">ONIX</div>
+          <div class="m-poke-level">Lv14</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:60%;background:#4a8a40;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-arena">
+      <div class="m-arena-sprite m-arena-sprite-you">🐛</div>
+      <div class="m-vs">⚔</div>
+      <div class="m-arena-sprite m-arena-sprite-enemy">🐍</div>
+    </div>
+
+    <!-- Your team with faint -->
+    <div class="m-team-strip">
+      <div class="m-poke m-poke-fainted">
+        <div class="m-poke-sprite" style="opacity:0.3;">🐸</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name" style="color:#4a3a3a;text-decoration:line-through;">BULBASAUR</div>
+          <div class="m-poke-level" style="color:#4a3a3a;">Lv9</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:0;"></div></div>
+        </div>
+      </div>
+      <div class="m-poke m-poke-active">
+        <div class="m-poke-sprite" style="border-color:#c8a96e;">🐛</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name">BUTTERFREE</div>
+          <div class="m-poke-level">Lv10</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:40%;background:#c8a020;"></div></div>
+        </div>
+      </div>
+      <div class="m-poke">
+        <div class="m-poke-sprite">🐦</div>
+        <div class="m-poke-info">
+          <div class="m-poke-name">PIDGEY</div>
+          <div class="m-poke-level">Lv7</div>
+          <div class="m-hp"><div class="m-hp-fill" style="width:100%;background:#4a8a40;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-dialog">
+      <div class="m-dialog-text">Onix used Rock Throw! <span class="m-dialog-cursor">▼</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>Mobile battle structure (top → bottom):</strong><br><br>
+  1. <strong>Header bar:</strong> "VS BROCK" + Skip button<br>
+  2. <strong>Enemy team strip:</strong> Horizontal row, right-aligned. Active = red border.<br>
+  3. <strong>Arena:</strong> Two large sprites face off. Bigger for 1v1, smaller for 5v5.<br>
+  4. <strong>Your team strip:</strong> Horizontal row, left-aligned. Active = gold border.<br>
+  5. <strong>Dialog:</strong> Typewriter text at bottom edge.<br><br>
+  <strong>Same data, vertical stack.</strong> Enemy at top (facing you), your team at bottom (backing you). Arena in the middle. Natural top-to-bottom reading order matches the battle flow.
+</div>
+
+</body>
+</html>
