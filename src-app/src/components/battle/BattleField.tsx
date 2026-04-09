@@ -55,12 +55,10 @@ function PokemonInfoPanel({
 
 function PokemonSprite({
   pokemon,
-  side,
   isDamaged,
   isFainted,
 }: {
   pokemon: PokemonInstance;
-  side: 'player' | 'enemy';
   isDamaged: boolean;
   isFainted: boolean;
 }) {
@@ -72,7 +70,6 @@ function PokemonSprite({
         'w-24 h-24 flex items-center justify-center relative',
         isDamaged ? 'animate-damage-shake' : '',
         isFainted ? 'opacity-30 transition-opacity duration-500' : '',
-        side === 'player' ? '' : '',
       ].filter(Boolean).join(' ')}
       style={{ imageRendering: 'pixelated' }}
     >
@@ -153,7 +150,6 @@ export function BattleField({
           {/* Enemy sprite (top-left) */}
           <PokemonSprite
             pokemon={enemyActive}
-            side="enemy"
             isDamaged={enemyDamaged}
             isFainted={enemyFainted}
           />
@@ -168,7 +164,6 @@ export function BattleField({
           {/* Player sprite (bottom-right) */}
           <PokemonSprite
             pokemon={playerActive}
-            side="player"
             isDamaged={playerDamaged}
             isFainted={playerFainted}
           />

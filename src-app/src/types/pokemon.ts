@@ -106,3 +106,17 @@ export interface EvolutionEntry {
 export interface EeveeEvolutionEntry extends EvolutionEntry {
   types: PokemonType[];
 }
+
+/**
+ * A Pokémon on a trainer's team (gym leader or Elite Four member).
+ * Used in gymLeaders.ts and elite4.ts.
+ * Note: `baseStats` intentionally omits `spdef` — the fallback builder derives it from `special`.
+ */
+export interface TrainerPokemon {
+  speciesId: number;
+  name: string;
+  types: PokemonType[];
+  baseStats: { hp: number; atk: number; def: number; speed: number; special: number };
+  level: number;
+  heldItem?: HeldItem;
+}

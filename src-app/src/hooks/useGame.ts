@@ -1,7 +1,14 @@
 import { createContext, useContext } from 'react';
+import type { StateFrom } from 'xstate';
+import type { MachineEvents } from '@/machines/gameMachine';
+import { gameMachine } from '@/machines/gameMachine';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const GameContext = createContext<{ state: any; send: any } | null>(null);
+interface GameContextValue {
+  state: StateFrom<typeof gameMachine>;
+  send: (event: MachineEvents) => void;
+}
+
+export const GameContext = createContext<GameContextValue | null>(null);
 
 export function useGame() {
   const ctx = useContext(GameContext);

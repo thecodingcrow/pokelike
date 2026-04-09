@@ -6,10 +6,10 @@
  */
 
 import type { PokemonSpecies, PokemonInstance, PokemonType } from '@/types/pokemon';
+import { calcHp } from '@/systems/battle-calc';
 
 // ── Cache key constants ───────────────────────────────────────────────────────
 
-const CACHE_KEY_SPECIES = 'pkrl_species_list';
 /** Prefix for per-species cache entries. Full key: `pkrl_poke_{id}`. */
 const CACHE_KEY_POKEMON_PREFIX = 'pkrl_poke_';
 
@@ -28,61 +28,6 @@ function setCached(key: string, value: unknown): void {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch { /* storage full or unavailable */ }
-}
-
-// ── Stale-cache eviction ──────────────────────────────────────────────────────
-
-/**
- * Remove any cached Pokemon that are missing the `spdef` field introduced when
- * special-attack and special-defense were split (matches the original IIFE).
- * Safe to call multiple times — entries are only removed when actually stale.
- */
-export function bustStalePokemonCache(): void {
-  try {
-    for (const key of Object.keys(localStorage)) {
-      if (!key.startsWith(CACHE_KEY_POKEMON_PREFIX)) continue;
-      const val = getCached<PokemonSpecies>(key);
-      if (
-        val &&
-        (val.baseStats.spdef === undefined ||
-          (val.baseStats as unknown as Record<string, unknown>)['special'] === undefined)
-      ) {
-        localStorage.removeItem(key);
-      }
-    }
-  } catch { /* unavailable */ }
-}
-
-// ── Species list ──────────────────────────────────────────────────────────────
-
-export interface SpeciesListEntry {
-  name: string;
-  id: number;
-}
-
-/**
- * Fetch the full list of Pokemon species from PokeAPI (up to 2000 results).
- * The result is cached in localStorage under `pkrl_species_list`.
- *
- * Returns null when the network is unavailable and no cache exists.
- */
-export async function fetchSpeciesList(): Promise<SpeciesListEntry[] | null> {
-  const cached = getCached<SpeciesListEntry[]>(CACHE_KEY_SPECIES);
-  if (cached) return cached;
-
-  try {
-    const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=2000');
-    const d = (await r.json()) as { results: { name: string }[] };
-    const list: SpeciesListEntry[] = d.results.map((p, i) => ({
-      name: p.name,
-      id: i + 1,
-    }));
-    setCached(CACHE_KEY_SPECIES, list);
-    return list;
-  } catch (e) {
-    console.warn('PokeAPI unavailable, using fallback data', e);
-    return null;
-  }
 }
 
 // ── Single Pokemon species ────────────────────────────────────────────────────
@@ -165,12 +110,6 @@ export async function fetchPokemonById(id: number): Promise<PokemonSpecies | nul
     console.warn(`Failed to fetch pokemon ${id}`, e);
     return null;
   }
-}
-
-// ── HP formula ────────────────────────────────────────────────────────────────
-
-function calcHp(baseHp: number, level: number): number {
-  return Math.floor((baseHp * level) / 50) + level + 10;
 }
 
 // ── Instance factory ──────────────────────────────────────────────────────────

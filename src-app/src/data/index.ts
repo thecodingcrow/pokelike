@@ -1,6 +1,6 @@
 import type { NodeWeightRow } from '@/types';
 
-export { TYPE_CHART, TYPE_IDS } from './typeChart';
+export { TYPE_CHART } from './typeChart';
 export { MOVE_POOL, TYPE_ITEM_MAP } from './moves';
 export * from './gymLeaders';
 export * from './elite4';

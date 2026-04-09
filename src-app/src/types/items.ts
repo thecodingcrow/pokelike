@@ -1,5 +1,3 @@
-import type { PokemonInstance } from './pokemon';
-
 /**
  * All item IDs from ITEM_POOL and USABLE_ITEM_POOL in data.js.
  */
@@ -57,14 +55,3 @@ export interface Item {
   minMap?: number;
 }
 
-/**
- * Signature for held-item effect functions.
- * These are computed inline inside battle.js (getEffectiveStat, calcDamage)
- * rather than stored as functions on the item objects, but this type is
- * useful when wiring up a future functional item system.
- *
- * @param holder    The Pokemon carrying the item.
- * @param context   An arbitrary payload for the effect (damage, stat value, etc.).
- * @returns         The modified context value.
- */
-export type HeldItemEffect = (holder: PokemonInstance, context: number) => number;

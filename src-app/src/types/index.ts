@@ -6,12 +6,12 @@ export type {
   HeldItem,
   EvolutionEntry,
   EeveeEvolutionEntry,
+  TrainerPokemon,
 } from './pokemon';
 
 export type {
   ItemId,
   Item,
-  HeldItemEffect,
 } from './items';
 
 export type {
@@ -39,7 +39,6 @@ export type {
   DetailedLogEventSendOut,
   DetailedLogEventTransform,
   DetailedLogEventResult,
-  AttackAnimEvent,
   LevelUpEvent,
 } from './battle';
 
@@ -51,5 +50,4 @@ export type {
   HallOfFamePokemon,
   HallOfFameEntry,
   Achievement,
-  GameState,
 } from './game';

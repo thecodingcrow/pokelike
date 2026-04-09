@@ -1,25 +1,12 @@
 // GYM_LEADERS — 8 gym leaders with their teams
 
-export interface GymHeldItem {
-  id: string;
-  name: string;
-  icon: string;
-}
-
-export interface GymPokemon {
-  speciesId: number;
-  name: string;
-  types: string[];
-  baseStats: { hp: number; atk: number; def: number; speed: number; special: number };
-  level: number;
-  heldItem?: GymHeldItem;
-}
+import type { TrainerPokemon } from '@/types';
 
 export interface GymLeader {
   name: string;
   badge: string;
   type: string;
-  team: GymPokemon[];
+  team: TrainerPokemon[];
 }
 
 export const GYM_LEADERS: GymLeader[] = [

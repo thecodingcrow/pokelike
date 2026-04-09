@@ -6,6 +6,7 @@ import { PokemonCard } from '@/components/ui/PokemonCard';
 import { PixelButton } from '@/components/ui/PixelButton';
 import { GEN1_EVOLUTIONS } from '@/data/evolutions';
 import { applyEvolution } from '@/systems/evolution';
+import { calcHp } from '@/systems/battle-calc';
 
 export function UsableItemModal() {
   const modalProps  = useUIStore((s) => s.modalProps);
@@ -39,7 +40,7 @@ export function UsableItemModal() {
       newTeam[idx] = { ...pokemon, currentHp: pokemon.maxHp };
     } else if (item!.id === 'rare_candy') {
       const newLevel = pokemon.level + 3;
-      const newMaxHp = Math.floor((pokemon.baseStats.hp * newLevel) / 50) + newLevel + 10;
+      const newMaxHp = calcHp(pokemon.baseStats.hp, newLevel);
       newTeam[idx] = { ...pokemon, level: newLevel, maxHp: newMaxHp };
     } else if (item!.id === 'moon_stone') {
       const evo = GEN1_EVOLUTIONS[pokemon.speciesId];

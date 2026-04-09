@@ -1,4 +1,4 @@
-import type { PokemonInstance, PokemonType } from './pokemon';
+import type { PokemonType } from './pokemon';
 
 /**
  * The player's chosen trainer gender — maps to Red (boy) or Dawn (girl) sprites.
@@ -79,31 +79,3 @@ export interface Achievement {
   unlocked?: boolean;
 }
 
-/**
- * The top-level runtime game state (mirrors the `state` object in game.js).
- *
- * `currentMap`     — which arena the player is on (0–8).
- * `currentNode`    — id of the node currently being played, or null.
- * `team`           — the player's active team (1–6 Pokemon).
- * `items`          — the player's bag items.
- * `badges`         — number of gym badges earned.
- * `map`            — the currently generated arena map, or null.
- * `eliteIndex`     — which Elite Four opponent is up next (0–4).
- * `trainer`        — the player's chosen gender.
- * `starterSpeciesId` — the species id of the chosen starter.
- * `maxTeamSize`    — current team size cap (unlocked through progression).
- * `hardMode`       — whether Hard Mode is active for this run.
- */
-export interface GameState {
-  currentMap: number;
-  currentNode: string | null;
-  team: PokemonInstance[];
-  items: import('./items').Item[];
-  badges: number;
-  map: import('./map').GeneratedMap | null;
-  eliteIndex: number;
-  trainer: TrainerGender;
-  starterSpeciesId: number | null;
-  maxTeamSize: number;
-  hardMode: boolean;
-}

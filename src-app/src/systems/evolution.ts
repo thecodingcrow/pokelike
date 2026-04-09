@@ -14,6 +14,7 @@ import type { PokemonInstance, PokemonSpecies } from '@/types/pokemon';
 import { GEN1_EVOLUTIONS } from '@/data/evolutions';
 import type { EvolutionEntry } from '@/data/evolutions';
 import { fetchPokemonById } from './pokeapi';
+import { calcHp } from '@/systems/battle-calc';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -26,12 +27,6 @@ export interface EvolutionResult {
   to: string;
   /** Index of this Pokemon within the original team array. */
   teamIndex: number;
-}
-
-// ── HP formula (must match pokeapi.ts) ───────────────────────────────────────
-
-function calcHp(baseHp: number, level: number): number {
-  return Math.floor((baseHp * level) / 50) + level + 10;
 }
 
 // ── applyEvolution ────────────────────────────────────────────────────────────

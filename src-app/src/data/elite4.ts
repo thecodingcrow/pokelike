@@ -1,25 +1,12 @@
 // ELITE_4 — Elite Four + Champion (Gary)
 
-export interface EliteHeldItem {
-  id: string;
-  name: string;
-  icon: string;
-}
-
-export interface ElitePokemon {
-  speciesId: number;
-  name: string;
-  types: string[];
-  baseStats: { hp: number; atk: number; def: number; speed: number; special: number };
-  level: number;
-  heldItem?: EliteHeldItem;
-}
+import type { TrainerPokemon } from '@/types';
 
 export interface EliteMember {
   name: string;
   title: string;
   type: string;
-  team: ElitePokemon[];
+  team: TrainerPokemon[];
 }
 
 export const ELITE_4: EliteMember[] = [

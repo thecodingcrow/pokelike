@@ -11,7 +11,7 @@
 
 import { setup, assign, fromPromise } from 'xstate';
 
-import type { NodeType, MapNode, PokemonInstance, Item, BattleResult as BattleResultType } from '@/types';
+import type { NodeType, MapNode, PokemonInstance, PokemonType, Item } from '@/types';
 import type { ModalId } from '@/store/uiStore';
 
 // ── Store imports ─────────────────────────────────────────────────────────────
@@ -27,7 +27,7 @@ import { GYM_LEADERS } from '@/data/gymLeaders';
 
 // ── System imports ────────────────────────────────────────────────────────────
 
-import { runBattle, applyLevelGain } from '@/systems/battle';
+import { runBattle, applyLevelGain, calcHp } from '@/systems/battle';
 import { fetchPokemonById, createInstance } from '@/systems/pokeapi';
 import { checkAndEvolveTeam } from '@/systems/evolution';
 import {
@@ -41,7 +41,7 @@ import {
 // ── Context ───────────────────────────────────────────────────────────────────
 
 /** BattleResult as stored in machine context after a battle resolves. */
-export interface BattleResult {
+export interface MachineBattleResult {
   playerWon: boolean;
   pTeam: PokemonInstance[];
   eTeam: PokemonInstance[];
@@ -52,7 +52,7 @@ export interface BattleResult {
 }
 
 export interface MachineContext {
-  battleResult: BattleResult | null;
+  battleResult: MachineBattleResult | null;
   /** Pokémon choices for catch/swap/shiny screens, or Item choices for item screen. */
   choices: PokemonInstance[] | Item[];
   /** The resolved node type (QUESTION mark is resolved before entering nodeDispatch). */
@@ -80,7 +80,7 @@ export type MachineEvents =
   | { type: 'SELECT_TRAINER'; trainer: 'boy' | 'girl' }
   | { type: 'SELECT_STARTER'; starter: PokemonInstance }
   | { type: 'CLICK_NODE'; node: MapNode }
-  | { type: 'BATTLE_COMPLETE'; result: BattleResult }
+  | { type: 'BATTLE_COMPLETE'; result: MachineBattleResult }
   | { type: 'MAKE_CHOICE'; index?: number; pokemon?: PokemonInstance; item?: Item }
   | { type: 'SKIP' }
   | { type: 'CONTINUE' }
@@ -101,14 +101,51 @@ export type RunBattleInput = {
   eliteIndex: number;
 };
 
-export type RunBattleOutput = BattleResult & {
+export type RunBattleOutput = MachineBattleResult & {
   battleTitle: string;
   battleSubtitle: string;
 };
 
-export type PlayBattleAnimationInput = { result: BattleResult };
+export type PlayBattleAnimationInput = { result: MachineBattleResult };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Build a minimal fallback PokemonInstance when PokeAPI is unavailable. */
+function buildFallbackPokemon(
+  speciesId: number,
+  name: string,
+  level: number,
+  types: PokemonType[],
+  baseStats: { hp: number; atk: number; def: number; speed: number; special: number },
+  moveTier: 0 | 1 | 2,
+  heldItem: PokemonInstance['heldItem'],
+): PokemonInstance {
+  const hp = calcHp(baseStats.hp, level);
+  return {
+    speciesId,
+    name,
+    nickname: null,
+    level,
+    types,
+    baseStats: { ...baseStats, spdef: baseStats.special },
+    currentHp: hp,
+    maxHp: hp,
+    isShiny: false,
+    spriteUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${speciesId}.png`,
+    megaStone: null,
+    heldItem,
+    moveTier,
+  };
+}
+
+/** Map a starter species ID (including evolutions) to its achievement ID. */
+function getStarterAchievement(speciesId: number | null): string | null {
+  if (!speciesId) return null;
+  if (speciesId <= 3) return 'starter_1';
+  if (speciesId <= 6) return 'starter_4';
+  if (speciesId <= 9) return 'starter_7';
+  return null;
+}
 
 /** Resolve a QUESTION mark node to a concrete type. */
 function resolveQuestionMark(hardModeWin: boolean): MachineContext['currentNodeType'] {
@@ -224,7 +261,7 @@ export const gameMachine = setup({
       battleSubtitle: ({ event }: { event: MachineEvents }) =>
         ((event as { output?: { battleSubtitle?: string } }).output?.battleSubtitle) ?? '',
       battleResult: ({ event }: { event: MachineEvents }) =>
-        ((event as { output?: BattleResult | null }).output) ?? null,
+        ((event as { output?: MachineBattleResult | null }).output) ?? null,
     }),
 
     storeBattleResult: assign({
@@ -322,11 +359,7 @@ export const gameMachine = setup({
       persist.unlockAchievement('elite_four');
       if (wins === 10) persist.unlockAchievement('elite_10');
       if (wins === 100) persist.unlockAchievement('elite_100');
-      const sid = gameStore.starterSpeciesId;
-      const starterAchId = [1, 2, 3].includes(sid ?? -1) ? 'starter_1'
-        : [4, 5, 6].includes(sid ?? -1) ? 'starter_4'
-        : [7, 8, 9].includes(sid ?? -1) ? 'starter_7'
-        : null;
+      const starterAchId = getStarterAchievement(gameStore.starterSpeciesId);
       if (starterAchId) persist.unlockAchievement(starterAchId);
       if (gameStore.maxTeamSize === 1) persist.unlockAchievement('solo_run');
       if (gameStore.hardMode) persist.unlockAchievement('hard_mode_win');
@@ -418,21 +451,7 @@ export const gameMachine = setup({
             const species = await fetchPokemonById(p.speciesId);
             if (!species) {
               // Fallback: build a minimal instance from the data object
-              return {
-                speciesId: p.speciesId,
-                name: p.name,
-                nickname: null,
-                level: p.level,
-                types: p.types as import('@/types').PokemonType[],
-                baseStats: { ...p.baseStats, spdef: p.baseStats.special },
-                currentHp: Math.floor(p.baseStats.hp * p.level / 50) + p.level + 10,
-                maxHp: Math.floor(p.baseStats.hp * p.level / 50) + p.level + 10,
-                isShiny: false,
-                spriteUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.speciesId}.png`,
-                megaStone: null,
-                heldItem: p.heldItem ?? null,
-                moveTier: 2 as 0 | 1 | 2,
-              } satisfies PokemonInstance;
+              return buildFallbackPokemon(p.speciesId, p.name, p.level, p.types, p.baseStats, 2, p.heldItem ?? null);
             }
             const inst = createInstance(species, p.level, false, 2);
             return { ...inst, heldItem: p.heldItem ?? null };
@@ -447,21 +466,7 @@ export const gameMachine = setup({
           leader.team.map(async (p) => {
             const species = await fetchPokemonById(p.speciesId);
             if (!species) {
-              return {
-                speciesId: p.speciesId,
-                name: p.name,
-                nickname: null,
-                level: p.level,
-                types: p.types as import('@/types').PokemonType[],
-                baseStats: { ...p.baseStats, spdef: p.baseStats.special },
-                currentHp: Math.floor(p.baseStats.hp * p.level / 50) + p.level + 10,
-                maxHp: Math.floor(p.baseStats.hp * p.level / 50) + p.level + 10,
-                isShiny: false,
-                spriteUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.speciesId}.png`,
-                megaStone: null,
-                heldItem: p.heldItem ?? null,
-                moveTier: 1 as 0 | 1 | 2,
-              } satisfies PokemonInstance;
+              return buildFallbackPokemon(p.speciesId, p.name, p.level, p.types, p.baseStats, 1, p.heldItem ?? null);
             }
             const inst = createInstance(species, p.level, false, 1);
             return { ...inst, heldItem: p.heldItem ?? null };
@@ -477,21 +482,11 @@ export const gameMachine = setup({
         // Ultra-fallback if PokeAPI is unavailable
         if (enemyTeam.length === 0) {
           const enemyLevel = 5 + currentMap * 5 + Math.floor(Math.random() * 5);
-          enemyTeam = [{
-            speciesId: 19,
-            name: 'Rattata',
-            nickname: null,
-            level: enemyLevel,
-            types: ['Normal'] as import('@/types').PokemonType[],
-            baseStats: { hp: 30, atk: 56, def: 35, speed: 72, special: 25, spdef: 35 },
-            currentHp: Math.floor(30 * enemyLevel / 50) + enemyLevel + 10,
-            maxHp: Math.floor(30 * enemyLevel / 50) + enemyLevel + 10,
-            isShiny: false,
-            spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/19.png',
-            megaStone: null,
-            heldItem: null,
-            moveTier: 0 as 0 | 1 | 2,
-          }];
+          enemyTeam = [buildFallbackPokemon(
+            19, 'Rattata', enemyLevel, ['Normal'],
+            { hp: 30, atk: 56, def: 35, speed: 72, special: 25 },
+            0, null,
+          )];
         }
 
         battleTitle = currentNode?.type === 'trainer' ? 'Trainer Battle!' : 'Wild Encounter!';
@@ -928,6 +923,3 @@ export const gameMachine = setup({
 });
 
 export type GameMachine = typeof gameMachine;
-
-// Re-export BattleResultType for callers that need the canonical type from @/types
-export type { BattleResultType };

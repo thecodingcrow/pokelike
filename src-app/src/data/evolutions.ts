@@ -1,6 +1,8 @@
 // GEN1_EVOLUTIONS — full Gen 1 evolution table
 // Stone/trade evolutions converted to sensible levels
 
+import type { PokemonType } from '@/types';
+
 export interface EvolutionEntry {
   into: number;
   level: number;
@@ -103,7 +105,7 @@ export const GEN1_EVOLUTIONS: Record<number, EvolutionEntry> = {
 
 // Eevee branching evolution options (shown as a choice at level 36)
 export interface BranchEvolutionEntry extends EvolutionEntry {
-  types: string[];
+  types: PokemonType[];
 }
 
 export const EEVEE_EVOLUTIONS: BranchEvolutionEntry[] = [

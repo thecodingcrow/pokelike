@@ -102,20 +102,6 @@ export type DetailedLogEvent =
   | DetailedLogEventResult;
 
 /**
- * Data payload for a canvas projectile / animation event.
- * Used as the argument to `playAttackAnimation` in ui.js.
- */
-export interface AttackAnimEvent {
-  moveType: string;
-  moveName: string;
-  isSpecial: boolean;
-  /** DOM element for the attacking Pokemon's battle card. */
-  attackerEl: HTMLElement;
-  /** DOM element for the defending Pokemon's battle card. */
-  targetEl: HTMLElement;
-}
-
-/**
  * A level-up event returned by `applyLevelGain` in battle.js.
  */
 export interface LevelUpEvent {
