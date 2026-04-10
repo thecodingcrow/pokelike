@@ -1,10 +1,12 @@
 import { PixelButton } from '@/components/ui/PixelButton';
+import { useGameStore } from '@/store/gameStore';
 import { usePersistenceStore } from '@/store/persistenceStore';
 import { useUIStore } from '@/store/uiStore';
 import { useGame } from '@/hooks/useGame';
 
 export function TitleScreen() {
   const { send } = useGame();
+  const hasActiveRun = useGameStore((s) => s.team.length > 0 && s.map !== null);
   const isPokedexComplete = usePersistenceStore((s) => s.isPokedexComplete());
   const openModal = useUIStore((s) => s.openModal);
 
@@ -30,8 +32,17 @@ export function TitleScreen() {
 
       {/* Main action buttons */}
       <div className="flex flex-col gap-4 w-full max-w-[220px]">
+        {hasActiveRun && (
+          <PixelButton
+            variant="primary"
+            className="w-full justify-center"
+            onClick={() => send({ type: 'RESUME_RUN' })}
+          >
+            CONTINUE
+          </PixelButton>
+        )}
         <PixelButton
-          variant="primary"
+          variant={hasActiveRun ? 'ghost' : 'primary'}
           className="w-full justify-center"
           onClick={() => send({ type: 'START_RUN', hardMode: false })}
         >

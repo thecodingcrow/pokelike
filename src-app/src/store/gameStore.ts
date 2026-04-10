@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { PokemonInstance } from '@/types/pokemon';
 import type { Item } from '@/types/items';
 import type { MapNode, GeneratedMap } from '@/types';
@@ -71,7 +72,9 @@ const INITIAL_STATE: GameData = {
   hardMode: false,
 };
 
-export const useGameStore = create<GameStore>((set) => ({
+export const useGameStore = create<GameStore>()(
+  persist(
+    (set) => ({
   ...INITIAL_STATE,
 
   setTrainer: (trainer) => set({ trainer }),
@@ -172,4 +175,23 @@ export const useGameStore = create<GameStore>((set) => ({
       maxTeamSize: 1,
       hardMode,
     }),
-}));
+}),
+    {
+      name: 'pokelike-run',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (s) => ({
+        currentMap: s.currentMap,
+        currentNode: s.currentNode,
+        team: s.team,
+        items: s.items,
+        badges: s.badges,
+        map: s.map,
+        eliteIndex: s.eliteIndex,
+        trainer: s.trainer,
+        starterSpeciesId: s.starterSpeciesId,
+        maxTeamSize: s.maxTeamSize,
+        hardMode: s.hardMode,
+      }) as unknown as GameStore,
+    },
+  ),
+);

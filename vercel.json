@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd src-app && pnpm install && pnpm build",
+  "outputDirectory": "src-app/dist",
+  "framework": "vite"
+}

@@ -77,6 +77,7 @@ export interface MachineContext {
 
 export type MachineEvents =
   | { type: 'START_RUN'; hardMode?: boolean }
+  | { type: 'RESUME_RUN' }
   | { type: 'SELECT_TRAINER'; trainer: 'boy' | 'girl' }
   | { type: 'SELECT_STARTER'; starter: PokemonInstance }
   | { type: 'CLICK_NODE'; node: MapNode }
@@ -638,6 +639,9 @@ export const gameMachine = setup({
         START_RUN: {
           target: 'trainerSelect',
           actions: 'resetRunAction',
+        },
+        RESUME_RUN: {
+          target: 'map',
         },
       },
     },
