@@ -97,7 +97,12 @@ export function MapScreen() {
   }
 
   function handleItemClick(item: Item) {
-    openModal('item-equip', { item });
+    const itemIdx = items.indexOf(item);
+    if (item.isUsable) {
+      openModal('usable-item', { item, itemIdx });
+    } else {
+      openModal('item-equip', { item });
+    }
   }
 
   function handleNodeClick(node: MapNode) {

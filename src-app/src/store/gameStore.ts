@@ -33,8 +33,13 @@ export interface GameStore {
   /**
    * Equip a bag item to a Pokemon slot.
    * Sets the item's `heldItem` on the Pokemon and removes the item from the bag.
+   * If the Pokemon already holds an item, that item is returned to the bag first.
    */
   equipItem: (item: Item, pokemonIdx: number) => void;
+  /**
+   * Unequip the held item from a Pokemon slot and return it to the bag.
+   */
+  unequipItem: (pokemonIdx: number) => void;
   incrementBadges: () => void;
   setEliteIndex: (index: number) => void;
   setStarterSpeciesId: (id: number) => void;
@@ -117,12 +122,47 @@ export const useGameStore = create<GameStore>()(
       const team = [...s.team];
       if (!team[pokemonIdx]) return {};
 
-      const items = s.items.filter((_, i) => i !== itemBagIdx);
+      let items = s.items.filter((_, i) => i !== itemBagIdx);
+
+      // If the pokemon already has a held item, return it to the bag first
+      const oldHeld = team[pokemonIdx].heldItem;
+      if (oldHeld) {
+        const returnedItem: Item = {
+          id: oldHeld.id as Item['id'],
+          name: oldHeld.name,
+          desc: '',
+          icon: oldHeld.icon,
+          isUsable: false,
+          minMap: 0,
+        };
+        items = [...items, returnedItem];
+      }
+
       team[pokemonIdx] = {
         ...team[pokemonIdx],
         heldItem: { id: item.id, name: item.name, icon: item.icon },
       };
       return { items, team };
+    }),
+
+  unequipItem: (pokemonIdx) =>
+    set((s) => {
+      const team = [...s.team];
+      const pokemon = team[pokemonIdx];
+      if (!pokemon || !pokemon.heldItem) return {};
+
+      const { heldItem } = pokemon;
+      const returnedItem: Item = {
+        id: heldItem.id as Item['id'],
+        name: heldItem.name,
+        desc: '',
+        icon: heldItem.icon,
+        isUsable: false,
+        minMap: 0,
+      };
+
+      team[pokemonIdx] = { ...pokemon, heldItem: null };
+      return { team, items: [...s.items, returnedItem] };
     }),
 
   incrementBadges: () =>

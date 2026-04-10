@@ -18,15 +18,15 @@ function hpDotColor(current: number, max: number): string {
 }
 
 export function TeamBar({ team, readonly: isReadonly = false, onReorder, layout = 'strip' }: TeamBarProps) {
-  const [hovered, setHovered]       = useState<{ pokemon: PokemonInstance; anchor: { x: number; y: number } } | null>(null);
+  const [hovered, setHovered]       = useState<{ pokemon: PokemonInstance; pokemonIdx: number; anchor: { x: number; y: number } } | null>(null);
   const [dragFrom, setDragFrom]     = useState<number | null>(null);
   const containerRef                 = useRef<HTMLDivElement>(null);
 
   const slots = Array.from({ length: 6 }, (_, i) => team[i] ?? null);
 
-  function handleMouseEnter(pokemon: PokemonInstance, e: React.MouseEvent) {
+  function handleMouseEnter(pokemon: PokemonInstance, pokemonIdx: number, e: React.MouseEvent) {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setHovered({ pokemon, anchor: { x: rect.left + rect.width / 2, y: rect.top } });
+    setHovered({ pokemon, pokemonIdx, anchor: { x: rect.left + rect.width / 2, y: rect.top } });
   }
 
   function handleDragStart(idx: number) {
@@ -64,7 +64,7 @@ export function TeamBar({ team, readonly: isReadonly = false, onReorder, layout 
             onDragStart={() => handleDragStart(i)}
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => handleDrop(i)}
-            onMouseEnter={pokemon ? (e) => handleMouseEnter(pokemon, e) : undefined}
+            onMouseEnter={pokemon ? (e) => handleMouseEnter(pokemon, i, e) : undefined}
           >
             {pokemon ? (
               <>
@@ -105,6 +105,7 @@ export function TeamBar({ team, readonly: isReadonly = false, onReorder, layout 
 
       <TeamHoverCard
         pokemon={hovered?.pokemon ?? null}
+        pokemonIdx={hovered?.pokemonIdx ?? 0}
         anchor={hovered?.anchor ?? null}
       />
     </>
