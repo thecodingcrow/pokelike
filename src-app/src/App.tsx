@@ -23,17 +23,9 @@ export default function App() {
 
   return (
     <GameContext.Provider value={{ state, send }}>
-      <div className="min-h-dvh crt-overlay" style={{ backgroundColor: '#0a0a0f' }}>
-        <div
-          className="w-full max-w-[480px] min-h-dvh mx-auto relative overflow-hidden"
-          style={{
-            borderLeft:  '2px solid rgba(255,255,255,0.1)',
-            borderRight: '2px solid rgba(255,255,255,0.1)',
-          }}
-        >
-          <ScreenRouter screen={screen} />
-          <ModalRouter />
-        </div>
+      <div className="game-canvas fixed inset-0 overflow-hidden" style={{ backgroundColor: '#0d110e' }}>
+        <ScreenRouter screen={screen} />
+        <ModalRouter />
       </div>
     </GameContext.Provider>
   );

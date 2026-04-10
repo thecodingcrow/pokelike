@@ -16,13 +16,13 @@ export function TradeScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[#0a0a0f]">
+    <div className="screen-default flex flex-col h-full">
       {/* Header */}
-      <div className="bg-[#121827] border-b-2 border-white px-4 py-3 flex-shrink-0">
-        <h1 className="font-pixel text-[12px] text-white text-center leading-[1.8]">
+      <div className="bg-[#161d14] border-b-2 border-[#c8a96e] px-4 py-3 flex-shrink-0">
+        <h1 className="font-pixel text-[12px] text-[#f0ead6] text-center leading-[1.8]">
           Trade offer!
         </h1>
-        <p className="font-terminal text-[20px] text-[#94a3b8] text-center mt-1">
+        <p className="font-terminal text-[20px] text-[#c8a96e] text-center mt-1">
           Give one of your Pokemon and receive a stronger one!
         </p>
       </div>
@@ -37,11 +37,11 @@ export function TradeScreen() {
         )}
 
         {/* Divider */}
-        <div className="w-full border-t-2 border-white/20" />
+        <div className="w-full border-t-2 border-[#c8a96e]/20" />
 
         {/* Give section */}
         <div className="flex flex-col items-center gap-3 w-full">
-          <span className="font-terminal text-[20px] text-[#94a3b8]">Give:</span>
+          <span className="font-terminal text-[20px] text-[#c8a96e]">Give:</span>
           <div className="flex flex-col gap-2 w-full max-w-sm">
             {team.map((pokemon, idx) => {
               const displayName = pokemon.nickname ?? pokemon.name;
@@ -49,11 +49,11 @@ export function TradeScreen() {
                 <button
                   key={`${pokemon.speciesId}-${idx}`}
                   className={[
-                    'bg-[#121827] border-2 border-white p-2',
+                    'bg-[#161d14] border-2 border-[#c8a96e] p-2',
                     'flex items-center gap-3',
-                    'shadow-[4px_4px_0px_#000]',
+                    'shadow-[4px_4px_0px_#050805]',
                     'cursor-pointer',
-                    'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#000]',
+                    'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#050805]',
                     'active:translate-x-0.5 active:translate-y-0.5 active:shadow-none',
                     'transition-none text-left w-full',
                   ].join(' ')}
@@ -66,10 +66,10 @@ export function TradeScreen() {
                     style={{ imageRendering: 'pixelated' }}
                   />
                   <div className="flex flex-col min-w-0">
-                    <span className="font-pixel text-[10px] text-white truncate">
+                    <span className="font-pixel text-[10px] text-[#f0ead6] truncate">
                       {displayName.toUpperCase()}
                     </span>
-                    <span className="font-mono text-sm text-[#94a3b8]">
+                    <span className="font-mono text-sm text-[#c8a96e]">
                       Lv. {pokemon.level}
                     </span>
                   </div>
@@ -81,7 +81,7 @@ export function TradeScreen() {
       </div>
 
       {/* Decline */}
-      <div className="bg-[#121827] border-t-2 border-white px-4 py-3 flex justify-end flex-shrink-0">
+      <div className="bg-[#161d14] border-t-2 border-[#c8a96e] px-4 py-3 flex justify-end flex-shrink-0">
         <PixelButton variant="ghost" onClick={() => send({ type: 'SKIP' })}>
           Decline
         </PixelButton>

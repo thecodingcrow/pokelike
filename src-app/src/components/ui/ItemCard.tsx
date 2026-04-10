@@ -16,9 +16,9 @@ export function ItemCard({ item, onClick, selected }: ItemCardProps) {
   return (
     <div
       className={[
-        'bg-[#121827] border-2 p-3 shadow-[4px_4px_0px_#000]',
-        selected ? 'border-yellow-400' : 'border-white',
-        onClick ? 'cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#000] transition-none' : '',
+        'bg-[#161d14] border-2 p-3 shadow-[3px_3px_0px_#050805]',
+        selected ? 'border-[#e8c97e] shadow-[0_0_12px_rgba(200,169,110,0.3)]' : 'border-[#c8a96e]',
+        onClick ? 'cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-3px] hover:shadow-[5px_5px_0px_#050805] transition-all duration-150 ease-out' : '',
       ].join(' ')}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
@@ -41,19 +41,19 @@ export function ItemCard({ item, onClick, selected }: ItemCardProps) {
       </div>
 
       {/* Name */}
-      <div className="font-pixel text-[10px] text-white text-center truncate">
+      <div className="font-pixel text-[10px] text-[#f0ead6] text-center truncate">
         {item.name.toUpperCase()}
       </div>
 
       {/* Description */}
-      <div className="font-terminal text-[16px] text-[#94a3b8] text-center mt-1 leading-tight">
+      <div className="font-terminal text-[16px] text-[#c8a96e] text-center mt-1 leading-tight">
         {item.desc}
       </div>
 
       {/* Usable badge */}
       {item.isUsable && (
         <div className="mt-2 flex justify-center">
-          <span className="font-pixel text-[8px] text-black bg-[#22c55e] border border-white px-1 py-0.5">
+          <span className="font-pixel text-[8px] text-[#050805] bg-[#22c55e] border border-[#c8a96e] px-1 py-0.5">
             USABLE
           </span>
         </div>

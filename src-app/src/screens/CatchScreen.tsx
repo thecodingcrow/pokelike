@@ -31,10 +31,10 @@ export function CatchScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[#0a0a0f]">
+    <div className="screen-default flex flex-col h-full">
       {/* Header */}
-      <div className="bg-[#121827] border-b-2 border-white px-4 py-3 flex-shrink-0">
-        <h1 className="font-pixel text-[12px] text-white text-center leading-[1.8]">
+      <div className="bg-[#161d14] border-b-2 border-[#c8a96e] px-4 py-3 flex-shrink-0">
+        <h1 className="font-pixel text-[12px] text-[#f0ead6] text-center leading-[1.8]">
           Choose a Pokemon to catch!
         </h1>
       </div>
@@ -58,7 +58,7 @@ export function CatchScreen() {
       </div>
 
       {/* Action buttons */}
-      <div className="bg-[#121827] border-t-2 border-white px-4 py-3 flex items-center justify-between gap-3 flex-shrink-0">
+      <div className="bg-[#161d14] border-t-2 border-[#c8a96e] px-4 py-3 flex items-center justify-between gap-3 flex-shrink-0">
         {/* Team display */}
         <TeamBar team={team} readonly />
 

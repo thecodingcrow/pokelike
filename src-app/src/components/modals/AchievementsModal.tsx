@@ -15,11 +15,11 @@ export function AchievementsModal() {
       {/* backdrop */}
       <div className="fixed inset-0 bg-black/60" onClick={closeModal} />
 
-      <div className="w-full max-w-[480px] bg-[#0a0a0f] border-t-4 border-white shadow-[0_-4px_0_#000] p-6 pb-8 max-h-[80vh] overflow-y-auto relative z-10">
+      <div className="w-full max-w-[480px] bg-[#0d110e] border-t-4 border-[#c8a96e] shadow-[0_-4px_0_#050805] p-6 pb-8 max-h-[80vh] overflow-y-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div className="font-pixel text-[12px] text-white">ACHIEVEMENTS</div>
-          <div className="font-mono text-[12px] text-[#94a3b8]">
+          <div className="font-pixel text-[12px] text-[#f0ead6]">ACHIEVEMENTS</div>
+          <div className="font-mono text-[12px] text-[#c8a96e]">
             {unlockedCount}/{total}
           </div>
         </div>
@@ -32,10 +32,10 @@ export function AchievementsModal() {
               <div
                 key={ach.id}
                 className={[
-                  'flex items-start gap-3 border-2 p-3 shadow-[2px_2px_0_#000]',
+                  'flex items-start gap-3 border-2 p-3 shadow-[2px_2px_0_#050805]',
                   isUnlocked
-                    ? 'border-white bg-[#121827]'
-                    : 'border-white/20 bg-[#0d0d14]',
+                    ? 'border-[#c8a96e] bg-[#161d14]'
+                    : 'border-[#c8a96e]/20 bg-[#0d110e]',
                 ].join(' ')}
               >
                 {/* Icon column */}
@@ -51,9 +51,9 @@ export function AchievementsModal() {
                       aria-label="locked"
                       className="opacity-30"
                     >
-                      <rect x="3" y="9" width="14" height="10" fill="white" />
-                      <rect x="6" y="5" width="8" height="6" stroke="white" strokeWidth="2" fill="none" />
-                      <rect x="8" y="12" width="4" height="3" fill="#0a0a0f" />
+                      <rect x="3" y="9" width="14" height="10" fill="#f0ead6" />
+                      <rect x="6" y="5" width="8" height="6" stroke="#c8a96e" strokeWidth="2" fill="none" />
+                      <rect x="8" y="12" width="4" height="3" fill="#0d110e" />
                     </svg>
                   )}
                 </div>
@@ -63,17 +63,17 @@ export function AchievementsModal() {
                   <div
                     className={[
                       'font-pixel text-[9px] leading-relaxed',
-                      isUnlocked ? 'text-white' : 'text-[#4a5568]',
+                      isUnlocked ? 'text-[#f0ead6]' : 'text-[#c8a96e]/40',
                     ].join(' ')}
                   >
                     {ach.name}
                   </div>
                   {isUnlocked ? (
-                    <div className="font-terminal text-[16px] text-[#94a3b8] mt-1 leading-tight">
+                    <div className="font-terminal text-[16px] text-[#c8a96e] mt-1 leading-tight">
                       {ach.desc}
                     </div>
                   ) : (
-                    <div className="font-terminal text-[16px] text-[#2a3040] mt-1 leading-tight">
+                    <div className="font-terminal text-[16px] text-[#c8a96e]/20 mt-1 leading-tight">
                       ???
                     </div>
                   )}

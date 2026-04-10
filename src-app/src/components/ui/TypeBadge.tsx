@@ -30,7 +30,7 @@ export function TypeBadge({ type }: TypeBadgeProps) {
   return (
     <span
       className="type-badge"
-      style={{ backgroundColor: bg }}
+      style={{ backgroundColor: bg, boxShadow: '2px 2px 0 #050805' }}
     >
       {type}
     </span>

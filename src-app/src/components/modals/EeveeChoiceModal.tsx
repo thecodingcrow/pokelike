@@ -36,10 +36,10 @@ export function EeveeChoiceModal() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center">
-      <div className="w-full max-w-[480px] bg-[#0a0a0f] border-t-4 border-white shadow-[0_-4px_0_#000] p-6 pb-8 max-h-[80vh] overflow-y-auto">
+      <div className="w-full max-w-[480px] bg-[#0d110e] border-t-4 border-[#c8a96e] shadow-[0_-4px_0_#050805] p-6 pb-8 max-h-[80vh] overflow-y-auto">
         {/* Header */}
-        <div className="font-pixel text-[12px] text-white mb-1">EEVEE IS EVOLVING!</div>
-        <div className="font-terminal text-[18px] text-[#94a3b8] mb-6">Choose a form:</div>
+        <div className="font-pixel text-[12px] text-[#f0ead6] mb-1">EEVEE IS EVOLVING!</div>
+        <div className="font-terminal text-[18px] text-[#c8a96e] mb-6">Choose a form:</div>
 
         {/* Evolution choices */}
         <div className="flex gap-3 justify-center mb-6">
@@ -47,7 +47,7 @@ export function EeveeChoiceModal() {
             <button
               key={evo.into}
               onClick={() => { void handleChoose(evo); }}
-              className="flex flex-col items-center bg-[#121827] border-2 border-white p-4 cursor-pointer shadow-[4px_4px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#000] transition-none flex-1"
+              className="flex flex-col items-center bg-[#161d14] border-2 border-[#c8a96e] p-4 cursor-pointer shadow-[4px_4px_0px_#050805] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#050805] transition-none flex-1"
             >
               <img
                 src={`${SPRITE_BASE}/${evo.into}.png`}
@@ -55,10 +55,10 @@ export function EeveeChoiceModal() {
                 className="w-16 h-16"
                 style={{ imageRendering: 'pixelated' }}
               />
-              <div className="font-pixel text-[9px] text-white mt-2">
+              <div className="font-pixel text-[9px] text-[#f0ead6] mt-2">
                 {evo.name.toUpperCase()}
               </div>
-              <div className="font-terminal text-[16px] text-[#94a3b8] mt-1">
+              <div className="font-terminal text-[16px] text-[#c8a96e] mt-1">
                 {evo.types.join('/')}
               </div>
             </button>

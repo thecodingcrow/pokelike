@@ -7,7 +7,7 @@ export function TransitionScreen() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-dvh bg-game-bg px-4 gap-6"
+      className="screen-default flex flex-col items-center justify-center h-full px-4 gap-6"
       style={{
         animation: 'fadeInSteps 400ms steps(4, end) forwards',
       }}
@@ -20,20 +20,20 @@ export function TransitionScreen() {
       `}</style>
 
       {/* Decorative top bar */}
-      <div className="w-32 h-[2px] bg-white opacity-40" />
+      <div className="w-32 h-[2px] bg-[#c8a96e] opacity-40" />
 
       {/* Main message */}
-      <p className="font-pixel text-[14px] text-white text-center leading-[1.8]">
+      <p className="font-pixel text-[14px] text-[#f0ead6] text-center leading-[1.8]">
         {msg}
       </p>
 
       {/* Sub message */}
-      <p className="font-terminal text-[22px] text-[#94a3b8] text-center">
+      <p className="font-terminal text-[22px] text-[#c8a96e] text-center">
         {sub}
       </p>
 
       {/* Decorative bottom bar */}
-      <div className="w-32 h-[2px] bg-white opacity-40" />
+      <div className="w-32 h-[2px] bg-[#c8a96e] opacity-40" />
     </div>
   );
 }

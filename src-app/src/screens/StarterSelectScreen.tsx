@@ -22,13 +22,13 @@ export function StarterSelectScreen() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh bg-game-bg px-4 gap-8">
-      <h2 className="font-pixel text-[12px] text-white leading-[1.8] text-center">
+    <div className="screen-default flex flex-col items-center justify-center h-full px-4 gap-8 overflow-y-auto">
+      <h2 className="font-pixel text-[12px] text-[#f0ead6] leading-[1.8] text-center">
         Choose your starter!
       </h2>
 
       {isLoading ? (
-        <div className="flex items-center gap-1 font-terminal text-[24px] text-[#94a3b8]">
+        <div className="flex items-center gap-1 font-terminal text-[24px] text-[#c8a96e]">
           Loading
           <span className="animate-blink ml-0.5">_</span>
         </div>
@@ -52,9 +52,9 @@ export function StarterSelectScreen() {
           </div>
 
           {selected && (
-            <p className="font-terminal text-[20px] text-[#94a3b8] text-center">
+            <p className="font-terminal text-[20px] text-[#c8a96e] text-center">
               Click{' '}
-              <span className="text-white font-terminal text-[20px]">
+              <span className="text-[#f0ead6] font-terminal text-[20px]">
                 {selected.nickname ?? selected.name}
               </span>{' '}
               again to confirm, or choose another.

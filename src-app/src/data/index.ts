@@ -57,12 +57,12 @@ export const TRAINER_SPRITE_NAMES: Record<TrainerSpriteKey, string> = {
 // ── Gym leader sprite paths ───────────────────────────────────────────────────
 
 export const GYM_LEADER_SPRITES: string[] = [
-  'sprites/brock.png',
-  'sprites/misty.png',
-  'sprites/lt. surge.png',
-  'sprites/erika.png',
-  'sprites/koga.png',
-  'sprites/sabrina.png',
-  'sprites/blaine.png',
-  'sprites/giovanni.png',
+  '/sprites/brock.png',
+  '/sprites/misty.png',
+  '/sprites/lt. surge.png',
+  '/sprites/erika.png',
+  '/sprites/koga.png',
+  '/sprites/sabrina.png',
+  '/sprites/blaine.png',
+  '/sprites/giovanni.png',
 ];

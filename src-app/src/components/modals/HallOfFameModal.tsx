@@ -13,17 +13,17 @@ export function HallOfFameModal() {
       {/* backdrop */}
       <div className="fixed inset-0 bg-black/60" onClick={closeModal} />
 
-      <div className="w-full max-w-[480px] bg-[#0a0a0f] border-t-4 border-white shadow-[0_-4px_0_#000] p-6 pb-8 max-h-[80vh] overflow-y-auto relative z-10">
+      <div className="w-full max-w-[480px] bg-[#0d110e] border-t-4 border-[#c8a96e] shadow-[0_-4px_0_#050805] p-6 pb-8 max-h-[80vh] overflow-y-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div className="font-pixel text-[12px] text-white">HALL OF FAME</div>
-          <div className="font-mono text-[12px] text-[#94a3b8]">
+          <div className="font-pixel text-[12px] text-[#f0ead6]">HALL OF FAME</div>
+          <div className="font-mono text-[12px] text-[#c8a96e]">
             {hallOfFame.length} {hallOfFame.length === 1 ? 'victory' : 'victories'}
           </div>
         </div>
 
         {entries.length === 0 ? (
-          <div className="font-terminal text-[20px] text-[#94a3b8] text-center py-8 border-2 border-white/10 mb-6">
+          <div className="font-terminal text-[20px] text-[#c8a96e] text-center py-8 border-2 border-[#c8a96e]/10 mb-6">
             No victories yet.<br />
             Defeat the Elite Four!
           </div>
@@ -32,7 +32,7 @@ export function HallOfFameModal() {
             {entries.map((entry, i) => (
               <div
                 key={`${entry.runNumber}-${i}`}
-                className="border-2 border-white bg-[#121827] shadow-[2px_2px_0_#000] p-4"
+                className="border-2 border-[#c8a96e] bg-[#161d14] shadow-[2px_2px_0_#050805] p-4"
               >
                 {/* Run header row */}
                 <div className="flex items-center justify-between mb-3">
@@ -41,13 +41,13 @@ export function HallOfFameModal() {
                       #{entry.runNumber}
                     </span>
                     {entry.hardMode && (
-                      <span className="font-pixel text-[7px] text-white bg-[#dc2626] border border-white px-2 py-0.5 shadow-[1px_1px_0_#000]">
+                      <span className="font-pixel text-[7px] text-[#f0ead6] bg-[#dc2626] border border-[#c8a96e] px-2 py-0.5 shadow-[1px_1px_0_#050805]">
                         HARD
                       </span>
                     )}
                   </div>
                   {entry.date && (
-                    <span className="font-terminal text-[16px] text-[#94a3b8]">
+                    <span className="font-terminal text-[16px] text-[#c8a96e]">
                       {entry.date}
                     </span>
                   )}
@@ -61,7 +61,7 @@ export function HallOfFameModal() {
                       className="relative group"
                       title={pokemon.nickname ?? pokemon.name}
                     >
-                      <div className="w-10 h-10 border border-white/20 bg-[#0a0a0f] flex items-center justify-center overflow-hidden">
+                      <div className="w-10 h-10 border border-[#c8a96e]/20 bg-[#0d110e] flex items-center justify-center overflow-hidden">
                         <img
                           src={
                             pokemon.isShiny
@@ -80,11 +80,11 @@ export function HallOfFameModal() {
                         )}
                       </div>
                       {/* Tooltip on hover */}
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 bg-[#0a0a0f] border border-white px-2 py-1 whitespace-nowrap shadow-[2px_2px_0_#000] hidden group-hover:block pointer-events-none">
-                        <div className="font-pixel text-[7px] text-white uppercase">
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 bg-[#0d110e] border border-[#c8a96e] px-2 py-1 whitespace-nowrap shadow-[2px_2px_0_#050805] hidden group-hover:block pointer-events-none">
+                        <div className="font-pixel text-[7px] text-[#f0ead6] uppercase">
                           {pokemon.nickname ? `${pokemon.nickname}` : pokemon.name}
                         </div>
-                        <div className="font-terminal text-[14px] text-[#94a3b8]">
+                        <div className="font-terminal text-[14px] text-[#c8a96e]">
                           Lv.{pokemon.level}
                         </div>
                       </div>
@@ -94,7 +94,7 @@ export function HallOfFameModal() {
                   {Array.from({ length: Math.max(0, 6 - entry.team.length) }).map((_, j) => (
                     <div
                       key={`empty-${j}`}
-                      className="w-10 h-10 border border-white/10 bg-[#0a0a0f]"
+                      className="w-10 h-10 border border-[#c8a96e]/10 bg-[#0d110e]"
                     />
                   ))}
                 </div>

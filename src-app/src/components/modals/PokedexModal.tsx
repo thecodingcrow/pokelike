@@ -31,17 +31,17 @@ export function PokedexModal() {
       {/* backdrop */}
       <div className="fixed inset-0 bg-black/60" onClick={closeModal} />
 
-      <div className="w-full max-w-[480px] bg-[#0a0a0f] border-t-4 border-white shadow-[0_-4px_0_#000] p-6 pb-8 max-h-[80vh] overflow-y-auto relative z-10">
+      <div className="w-full max-w-[480px] bg-[#0d110e] border-t-4 border-[#c8a96e] shadow-[0_-4px_0_#050805] p-6 pb-8 max-h-[80vh] overflow-y-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <div className="font-pixel text-[12px] text-white">POKEDEX</div>
-          <div className="font-mono text-[12px] text-[#94a3b8]">
+          <div className="font-pixel text-[12px] text-[#f0ead6]">POKEDEX</div>
+          <div className="font-mono text-[12px] text-[#c8a96e]">
             {count}/{TOTAL}
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex mb-4 border-2 border-white shadow-[2px_2px_0_#000]">
+        <div className="flex mb-4 border-2 border-[#c8a96e] shadow-[2px_2px_0_#050805]">
           {(['normal', 'shiny'] as const).map((t) => (
             <button
               key={t}
@@ -49,8 +49,8 @@ export function PokedexModal() {
               className={[
                 'flex-1 font-pixel text-[9px] py-2 cursor-pointer transition-none',
                 tab === t
-                  ? 'bg-white text-[#0a0a0f]'
-                  : 'bg-transparent text-[#94a3b8] hover:text-white',
+                  ? 'bg-[#c8a96e] text-[#0d110e]'
+                  : 'bg-transparent text-[#c8a96e] hover:text-[#f0ead6]',
               ].join(' ')}
             >
               {t === 'normal' ? 'REGULAR' : '✦ SHINY'}
@@ -68,7 +68,7 @@ export function PokedexModal() {
             return (
               <div
                 key={id}
-                className="relative flex flex-col items-center border border-white/10 bg-[#121827] p-1 cursor-default"
+                className="relative flex flex-col items-center border border-[#c8a96e]/10 bg-[#161d14] p-1 cursor-default"
                 onMouseEnter={() => setHovered(id)}
                 onMouseLeave={() => setHovered(null)}
               >
@@ -83,13 +83,13 @@ export function PokedexModal() {
                   />
                 ) : (
                   <div className="w-8 h-8 flex items-center justify-center">
-                    <span className="font-pixel text-[8px] text-[#1e2433]">?</span>
+                    <span className="font-pixel text-[8px] text-[#161d14]">?</span>
                   </div>
                 )}
                 <span
                   className={[
                     'font-pixel text-[6px] mt-0.5',
-                    caught ? 'text-[#94a3b8]' : 'text-[#1e2433]',
+                    caught ? 'text-[#c8a96e]' : 'text-[#161d14]',
                   ].join(' ')}
                 >
                   {String(id).padStart(3, '0')}
@@ -97,8 +97,8 @@ export function PokedexModal() {
 
                 {/* Hover tooltip */}
                 {showTip && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 bg-[#0a0a0f] border border-white px-2 py-1 whitespace-nowrap shadow-[2px_2px_0_#000]">
-                    <span className="font-pixel text-[7px] text-white uppercase">{name}</span>
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 bg-[#0d110e] border border-[#c8a96e] px-2 py-1 whitespace-nowrap shadow-[2px_2px_0_#050805]">
+                    <span className="font-pixel text-[7px] text-[#f0ead6] uppercase">{name}</span>
                   </div>
                 )}
               </div>

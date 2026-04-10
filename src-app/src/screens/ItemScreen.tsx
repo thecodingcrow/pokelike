@@ -15,10 +15,10 @@ export function ItemScreen() {
   );
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[#0a0a0f]">
+    <div className="screen-default flex flex-col h-full">
       {/* Header */}
-      <div className="bg-[#121827] border-b-2 border-white px-4 py-3 flex-shrink-0">
-        <h1 className="font-pixel text-[12px] text-white text-center leading-[1.8]">
+      <div className="bg-[#161d14] border-b-2 border-[#c8a96e] px-4 py-3 flex-shrink-0">
+        <h1 className="font-pixel text-[12px] text-[#f0ead6] text-center leading-[1.8]">
           Choose an item!
         </h1>
       </div>
@@ -37,8 +37,8 @@ export function ItemScreen() {
       </div>
 
       {/* Hint */}
-      <div className="bg-[#121827] border-t-2 border-white px-4 py-3 flex-shrink-0 text-center">
-        <span className="font-terminal text-[18px] text-[#94a3b8]">
+      <div className="bg-[#161d14] border-t-2 border-[#c8a96e] px-4 py-3 flex-shrink-0 text-center">
+        <span className="font-terminal text-[18px] text-[#c8a96e]">
           You must pick one — no skipping!
         </span>
       </div>

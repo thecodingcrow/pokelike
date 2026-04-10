@@ -64,7 +64,7 @@ function IconButton({
       title={label}
       className="
         w-9 h-9 flex items-center justify-center
-        border-2 border-white bg-game-panel text-white
+        border-2 border-[#c8a96e] bg-game-panel text-[#f0ead6]
         shadow-pixel
         hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-pixel-lg
         active:translate-x-0.5 active:translate-y-0.5 active:shadow-none
@@ -112,54 +112,147 @@ export function MapScreen() {
     : `Map ${currentMap + 1}`;
 
   return (
-    <div className="flex flex-col min-h-dvh bg-game-bg overflow-hidden">
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="flex items-center justify-between px-3 py-2 border-b-2 border-white/20 bg-game-panel shrink-0">
-        <BadgeBar badges={badges} />
+    <div className="screen-map h-full overflow-hidden">
+      {/*
+        Desktop (≥900px): CSS grid — 220px sidebar + map fills rest.
+        Tablet (640–899px) & Mobile (<640px): full-width map with floating overlays.
+      */}
 
-        <div className="flex items-center gap-2">
-          <span className="font-terminal text-[16px] text-[#94a3b8] hidden sm:block">
-            {mapLabel}
-          </span>
-          <IconButton label="Open Pokedex" onClick={() => openModal('pokedex')}>
-            <PokedexIcon />
-          </IconButton>
-          <IconButton label="Open Settings" onClick={() => openModal('settings')}>
-            <SettingsIcon />
-          </IconButton>
-        </div>
-      </header>
-
-      {/* ── Map area ───────────────────────────────────────────────────────── */}
-      <main className="flex-1 overflow-auto flex items-center justify-center p-2">
-        {map ? (
-          <MapCanvas map={map} onNodeClick={handleNodeClick} />
-        ) : (
-          <div className="font-terminal text-[24px] text-[#94a3b8] flex items-center gap-1">
-            Generating map
-            <span className="animate-blink">_</span>
+      {/*
+        We use a single container that switches between layouts via media queries.
+        The grid is activated at 900px via an inline style + a wrapper class.
+      */}
+      <div className="relative h-full map-screen-layout">
+        {/* ── Sidebar (desktop only) ───────────────────────────────────────── */}
+        <aside className="map-sidebar hidden flex-col gap-4 p-4 border-r-2 border-[#c8a96e]/30 bg-[#161d14] overflow-y-auto">
+          {/* Gym label */}
+          <div>
+            <div className="font-terminal text-[10px] text-[#c8a96e]/60 uppercase tracking-widest mb-1">
+              Current Map
+            </div>
+            <div className="font-terminal text-[14px] text-[#f0ead6]">
+              {mapLabel}
+            </div>
           </div>
-        )}
-      </main>
 
-      {/* ── Footer HUD ─────────────────────────────────────────────────────── */}
-      <footer className="shrink-0 border-t-2 border-white/20 bg-game-panel px-3 py-2 flex flex-col gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-pixel text-[8px] text-[#94a3b8] uppercase tracking-wide">
-            Team
-          </span>
-          <TeamBar team={team} onReorder={handleReorder} />
-        </div>
+          {/* Badges */}
+          <div>
+            <div className="font-terminal text-[10px] text-[#c8a96e]/60 uppercase tracking-widest mb-2">
+              Badges
+            </div>
+            <BadgeBar badges={badges} />
+          </div>
 
-        {items.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-pixel text-[8px] text-[#94a3b8] uppercase tracking-wide">
-              Items
+          {/* Team */}
+          <div>
+            <div className="font-terminal text-[10px] text-[#c8a96e]/60 uppercase tracking-widest mb-2">
+              Team
+            </div>
+            <TeamBar team={team} onReorder={handleReorder} layout="grid" />
+          </div>
+
+          {/* Items (if any) */}
+          {items.length > 0 && (
+            <div>
+              <div className="font-terminal text-[10px] text-[#c8a96e]/60 uppercase tracking-widest mb-2">
+                Items
+              </div>
+              <ItemBar items={items} onItemClick={handleItemClick} />
+            </div>
+          )}
+
+          {/* Action buttons */}
+          <div className="flex gap-2 mt-auto">
+            <IconButton label="Open Pokedex" onClick={() => openModal('pokedex')}>
+              <PokedexIcon />
+            </IconButton>
+            <IconButton label="Open Settings" onClick={() => openModal('settings')}>
+              <SettingsIcon />
+            </IconButton>
+          </div>
+        </aside>
+
+        {/* ── Map area ────────────────────────────────────────────────────── */}
+        <div className="map-canvas-area relative flex items-center justify-center overflow-hidden">
+          {map ? (
+            <MapCanvas map={map} onNodeClick={handleNodeClick} />
+          ) : (
+            <div className="font-terminal text-[24px] text-[#c8a96e]/60 flex items-center gap-1">
+              Generating map
+              <span className="animate-blink">_</span>
+            </div>
+          )}
+
+          {/* ── Mobile / tablet floating overlays (hidden on desktop) ──────── */}
+
+          {/* Top-left: badges */}
+          <div className="map-float-badges absolute top-3 left-3 z-10">
+            <BadgeBar badges={badges} />
+          </div>
+
+          {/* Top-right: icon buttons */}
+          <div className="map-float-actions absolute top-3 right-3 z-10 flex items-center gap-2">
+            <span className="font-terminal text-[11px] text-[#c8a96e]/60 hidden sm:inline">
+              {mapLabel}
             </span>
-            <ItemBar items={items} onItemClick={handleItemClick} />
+            <IconButton label="Open Pokedex" onClick={() => openModal('pokedex')}>
+              <PokedexIcon />
+            </IconButton>
+            <IconButton label="Open Settings" onClick={() => openModal('settings')}>
+              <SettingsIcon />
+            </IconButton>
           </div>
-        )}
-      </footer>
+
+          {/* Bottom: team strip + items */}
+          <div className="map-float-footer absolute bottom-3 left-3 right-3 z-10 flex items-end gap-3">
+            <TeamBar team={team} onReorder={handleReorder} />
+            {items.length > 0 && (
+              <ItemBar items={items} onItemClick={handleItemClick} />
+            )}
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        /* Desktop grid layout at 900px+ */
+        @media (min-width: 900px) {
+          .map-screen-layout {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+          }
+          .map-sidebar {
+            display: flex !important;
+          }
+          /* Hide floating overlays on desktop — sidebar handles those */
+          .map-float-badges,
+          .map-float-actions,
+          .map-float-footer {
+            display: none !important;
+          }
+        }
+
+        /* Mobile (<640px): ensure map fills height, floating overlays visible */
+        @media (max-width: 639px) {
+          .map-screen-layout {
+            display: block;
+          }
+          .map-canvas-area {
+            width: 100%;
+            height: 100%;
+          }
+        }
+
+        /* Tablet (640–899px): same as mobile, floating overlays */
+        @media (min-width: 640px) and (max-width: 899px) {
+          .map-screen-layout {
+            display: block;
+          }
+          .map-canvas-area {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      `}</style>
     </div>
   );
 }

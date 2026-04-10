@@ -6,6 +6,7 @@ interface TeamBarProps {
   team: PokemonInstance[];
   readonly?: boolean;
   onReorder?: (from: number, to: number) => void;
+  layout?: 'strip' | 'grid';
 }
 
 function hpDotColor(current: number, max: number): string {
@@ -16,7 +17,7 @@ function hpDotColor(current: number, max: number): string {
   return '#dc2626';
 }
 
-export function TeamBar({ team, readonly: isReadonly = false, onReorder }: TeamBarProps) {
+export function TeamBar({ team, readonly: isReadonly = false, onReorder, layout = 'strip' }: TeamBarProps) {
   const [hovered, setHovered]       = useState<{ pokemon: PokemonInstance; anchor: { x: number; y: number } } | null>(null);
   const [dragFrom, setDragFrom]     = useState<number | null>(null);
   const containerRef                 = useRef<HTMLDivElement>(null);
@@ -43,7 +44,7 @@ export function TeamBar({ team, readonly: isReadonly = false, onReorder }: TeamB
     <>
       <div
         ref={containerRef}
-        className="flex flex-row gap-1"
+        className={layout === 'grid' ? 'grid grid-cols-3 gap-1' : 'flex flex-row gap-1'}
         onMouseLeave={() => setHovered(null)}
       >
         {slots.map((pokemon, i) => (
@@ -51,7 +52,7 @@ export function TeamBar({ team, readonly: isReadonly = false, onReorder }: TeamB
             key={i}
             className={[
               'flex flex-col items-center gap-0.5 p-1 border-2',
-              pokemon ? 'border-white/40' : 'border-white/10 bg-[#1e2433]',
+              pokemon ? 'border-[#c8a96e]' : 'border-[#5a6a4a]/30 bg-[#161d14]',
               !isReadonly && pokemon ? 'cursor-grab' : '',
             ].join(' ')}
             style={{ width: 44, minHeight: 44 }}
@@ -75,14 +76,14 @@ export function TeamBar({ team, readonly: isReadonly = false, onReorder }: TeamB
                 />
                 {/* HP indicator dot */}
                 <div
-                  className="w-2 h-2 border border-black"
+                  className="w-2 h-2 border border-[#050805]"
                   style={{
                     backgroundColor: pokemon.currentHp <= 0 ? '#555' : hpDotColor(pokemon.currentHp, pokemon.maxHp),
                   }}
                 />
               </>
             ) : (
-              <div className="w-8 h-8 opacity-20 border border-white/20" />
+              <div className="w-8 h-8 opacity-20 border border-[#5a6a4a]/20" />
             )}
           </div>
         ))}

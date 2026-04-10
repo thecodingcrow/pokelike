@@ -57,16 +57,16 @@ export function UsableItemModal() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center">
-      <div className="w-full max-w-[480px] bg-[#0a0a0f] border-t-4 border-white shadow-[0_-4px_0_#000] p-6 pb-8 max-h-[80vh] overflow-y-auto">
+      <div className="w-full max-w-[480px] bg-[#0d110e] border-t-4 border-[#c8a96e] shadow-[0_-4px_0_#050805] p-6 pb-8 max-h-[80vh] overflow-y-auto">
         {/* Header */}
-        <div className="font-pixel text-[12px] text-white mb-1">{item.name.toUpperCase()}</div>
-        <div className="font-terminal text-[18px] text-[#94a3b8] mb-4">{item.desc}</div>
+        <div className="font-pixel text-[12px] text-[#f0ead6] mb-1">{item.name.toUpperCase()}</div>
+        <div className="font-terminal text-[18px] text-[#c8a96e] mb-4">{item.desc}</div>
 
         {/* Team list */}
-        <div className="font-pixel text-[10px] text-[#94a3b8] mb-3">USE ON:</div>
+        <div className="font-pixel text-[10px] text-[#c8a96e] mb-3">USE ON:</div>
         <div className="flex flex-col gap-3 mb-6">
           {eligible.length === 0 && (
-            <div className="font-terminal text-[18px] text-[#94a3b8]">No valid targets.</div>
+            <div className="font-terminal text-[18px] text-[#c8a96e]">No valid targets.</div>
           )}
           {eligible.map((pokemon, i) => (
             <PokemonCard

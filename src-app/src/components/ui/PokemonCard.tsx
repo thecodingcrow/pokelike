@@ -16,9 +16,9 @@ export function PokemonCard({ pokemon, onClick, selected, compact }: PokemonCard
   return (
     <div
       className={[
-        'bg-[#121827] border-2 p-3 shadow-[4px_4px_0px_#000]',
-        selected ? 'border-yellow-400' : 'border-white',
-        onClick ? 'cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#000] transition-none' : '',
+        'bg-[#161d14] border-2 p-3 shadow-[3px_3px_0px_#050805]',
+        selected ? 'border-[#e8c97e] shadow-[0_0_12px_rgba(200,169,110,0.3)]' : 'border-[#c8a96e]',
+        onClick ? 'cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-3px] hover:shadow-[5px_5px_0px_#050805] transition-all duration-150 ease-out' : '',
       ].join(' ')}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
@@ -36,12 +36,12 @@ export function PokemonCard({ pokemon, onClick, selected, compact }: PokemonCard
       </div>
 
       {/* Name */}
-      <div className="font-pixel text-[10px] text-white text-center truncate">
+      <div className="font-pixel text-[10px] text-[#f0ead6] text-center truncate">
         {displayName.toUpperCase()}
       </div>
 
       {/* Level */}
-      <div className="font-mono text-sm text-[#94a3b8] text-center">
+      <div className="font-mono text-sm text-[#c8a96e] text-center">
         Lv. {pokemon.level}
       </div>
 
@@ -64,7 +64,7 @@ export function PokemonCard({ pokemon, onClick, selected, compact }: PokemonCard
       {/* Held item */}
       {pokemon.heldItem && !compact && (
         <div className="mt-1 text-center">
-          <span className="font-mono text-[10px] text-[#94a3b8] border border-white/30 px-1">
+          <span className="font-mono text-[10px] text-[#c8a96e] border border-[#c8a96e]/30 px-1">
             {pokemon.heldItem.icon} {pokemon.heldItem.name}
           </span>
         </div>

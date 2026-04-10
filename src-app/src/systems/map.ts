@@ -279,14 +279,14 @@ export function getAccessibleNodes(map: GeneratedMap): MapNode[] {
  */
 export function getNodeSprite(node: MapNode): string | null {
   const ICON_SPRITES: Partial<Record<NodeType, string>> = {
-    battle:    'sprites/grass.png',
-    catch:     'sprites/catchPokemon.png',
-    item:      'sprites/itemIcon.png',
-    trade:     'sprites/tradeIcon.png',
-    legendary: 'sprites/legendaryEncounter.png',
-    question:  'sprites/questionMark.png',
-    pokecenter:'sprites/Poke Center.png',
-    move_tutor:'sprites/moveTutor.png',
+    battle:    '/sprites/grass.png',
+    catch:     '/sprites/catchPokemon.png',
+    item:      '/sprites/itemIcon.png',
+    trade:     '/sprites/tradeIcon.png',
+    legendary: '/sprites/legendaryEncounter.png',
+    question:  '/sprites/questionMark.png',
+    pokecenter:'/sprites/Poke Center.png',
+    move_tutor:'/sprites/moveTutor.png',
   };
 
   if (ICON_SPRITES[node.type]) return ICON_SPRITES[node.type]!;
@@ -295,13 +295,13 @@ export function getNodeSprite(node: MapNode): string | null {
     const key =
       (node.trainerSprite as TrainerSpriteKey | undefined) ??
       TRAINER_SPRITE_KEYS[Math.abs(hashId(node.id)) % TRAINER_SPRITE_KEYS.length];
-    return `sprites/${key}.png`;
+    return `/sprites/${key}.png`;
   }
 
   if (node.type === 'boss') {
     const mi = node.mapIndex ?? -1;
     if (mi >= 0 && mi < GYM_LEADER_SPRITES.length) return GYM_LEADER_SPRITES[mi];
-    return 'sprites/champ.png';
+    return '/sprites/champ.png';
   }
 
   return null;

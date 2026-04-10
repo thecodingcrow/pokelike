@@ -13,7 +13,7 @@ export function WinScreen() {
   const openModal = useUIStore((s) => s.openModal);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh bg-game-bg px-4 gap-6 py-8">
+    <div className="screen-default flex flex-col items-center justify-center h-full px-4 gap-6 py-8 overflow-y-auto">
 
       {/* Title */}
       <h1
@@ -28,7 +28,7 @@ export function WinScreen() {
 
       {/* Hall of Fame subtitle */}
       <div className="flex flex-col items-center gap-1">
-        <p className="font-pixel text-[10px] text-[#94a3b8] text-center">
+        <p className="font-pixel text-[10px] text-[#c8a96e] text-center">
           HALL OF FAME
         </p>
         <p className="font-terminal text-[20px] text-[#22c55e] text-center">
@@ -37,19 +37,19 @@ export function WinScreen() {
       </div>
 
       {/* Stats */}
-      <div className="bg-game-panel border-2 border-white shadow-[4px_4px_0px_#000] px-6 py-3 flex flex-col gap-1 w-full max-w-[320px]">
-        <p className="font-pixel text-[10px] text-[#94a3b8]">
-          TEAM SIZE: <span className="text-white">{team.length}</span>
+      <div className="bg-game-panel border-2 border-[#c8a96e] shadow-[4px_4px_0px_#050805] px-6 py-3 flex flex-col gap-1 w-full max-w-[320px]">
+        <p className="font-pixel text-[10px] text-[#c8a96e]">
+          TEAM SIZE: <span className="text-[#f0ead6]">{team.length}</span>
         </p>
-        <p className="font-pixel text-[10px] text-[#94a3b8]">
-          HARD MODE: <span className="text-white">{hardMode ? 'YES' : 'NO'}</span>
+        <p className="font-pixel text-[10px] text-[#c8a96e]">
+          HARD MODE: <span className="text-[#f0ead6]">{hardMode ? 'YES' : 'NO'}</span>
         </p>
       </div>
 
       {/* Final team grid — 2 columns */}
       {team.length > 0 && (
         <div className="w-full max-w-[360px]">
-          <p className="font-pixel text-[10px] text-[#94a3b8] mb-3 text-center">
+          <p className="font-pixel text-[10px] text-[#c8a96e] mb-3 text-center">
             FINAL TEAM
           </p>
           <div className="grid grid-cols-2 gap-2">

@@ -17,10 +17,10 @@ export function SwapScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[#0a0a0f]">
+    <div className="screen-default flex flex-col h-full">
       {/* Header */}
-      <div className="bg-[#121827] border-b-2 border-white px-4 py-3 flex-shrink-0">
-        <h1 className="font-pixel text-[12px] text-white text-center leading-[1.8]">
+      <div className="bg-[#161d14] border-b-2 border-[#c8a96e] px-4 py-3 flex-shrink-0">
+        <h1 className="font-pixel text-[12px] text-[#f0ead6] text-center leading-[1.8]">
           Team is full! Swap a member?
         </h1>
       </div>
@@ -29,19 +29,19 @@ export function SwapScreen() {
         {/* Incoming Pokemon */}
         {incoming && (
           <div className="flex flex-col items-center gap-2">
-            <span className="font-terminal text-[20px] text-[#94a3b8]">New Pokemon</span>
+            <span className="font-terminal text-[20px] text-[#c8a96e]">New Pokemon</span>
             <PokemonCard pokemon={incoming} />
           </div>
         )}
 
         {/* VS divider */}
-        <div className="font-pixel text-[14px] text-white border-2 border-white px-4 py-2 shadow-[4px_4px_0px_#000]">
+        <div className="font-pixel text-[14px] text-[#f0ead6] border-2 border-[#c8a96e] px-4 py-2 shadow-[4px_4px_0px_#050805]">
           VS
         </div>
 
         {/* Current team */}
         <div className="flex flex-col items-center gap-2 w-full">
-          <span className="font-terminal text-[20px] text-[#94a3b8]">
+          <span className="font-terminal text-[20px] text-[#c8a96e]">
             Click a team member to replace them
           </span>
           <div className="flex flex-row gap-3 flex-wrap justify-center">
@@ -57,7 +57,7 @@ export function SwapScreen() {
       </div>
 
       {/* Cancel */}
-      <div className="bg-[#121827] border-t-2 border-white px-4 py-3 flex justify-end flex-shrink-0">
+      <div className="bg-[#161d14] border-t-2 border-[#c8a96e] px-4 py-3 flex justify-end flex-shrink-0">
         <PixelButton variant="ghost" onClick={() => send({ type: 'SKIP' })}>
           Cancel
         </PixelButton>

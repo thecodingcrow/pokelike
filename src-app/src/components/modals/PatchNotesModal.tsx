@@ -24,23 +24,23 @@ export function PatchNotesModal() {
       {/* backdrop */}
       <div className="fixed inset-0 bg-black/60" onClick={closeModal} />
 
-      <div className="w-full max-w-[480px] bg-[#0a0a0f] border-t-4 border-white shadow-[0_-4px_0_#000] p-6 pb-8 max-h-[80vh] overflow-y-auto relative z-10">
+      <div className="w-full max-w-[480px] bg-[#0d110e] border-t-4 border-[#c8a96e] shadow-[0_-4px_0_#050805] p-6 pb-8 max-h-[80vh] overflow-y-auto relative z-10">
         {/* Header */}
-        <div className="font-pixel text-[12px] text-white mb-6">PATCH NOTES</div>
+        <div className="font-pixel text-[12px] text-[#f0ead6] mb-6">PATCH NOTES</div>
 
         {/* Entries */}
         <div className="flex flex-col gap-6 mb-6">
           {PATCH_NOTES.map((patch) => (
             <div key={patch.version}>
-              <div className="flex items-baseline gap-3 mb-2 border-b border-white/20 pb-2">
+              <div className="flex items-baseline gap-3 mb-2 border-b border-[#c8a96e]/20 pb-2">
                 <span className="font-pixel text-[10px] text-[#f8d030]">{patch.version}</span>
-                <span className="font-terminal text-[20px] text-[#94a3b8]">— {patch.title}</span>
+                <span className="font-terminal text-[20px] text-[#c8a96e]">— {patch.title}</span>
               </div>
               <ul className="flex flex-col gap-1">
                 {patch.notes.map((note, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <span className="font-terminal text-[20px] text-[#2563eb] flex-shrink-0 leading-tight">-</span>
-                    <span className="font-terminal text-[20px] text-white leading-tight">{note}</span>
+                    <span className="font-terminal text-[20px] text-[#f0ead6] leading-tight">{note}</span>
                   </li>
                 ))}
               </ul>

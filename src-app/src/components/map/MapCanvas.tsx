@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import type { GeneratedMap, MapNode } from '@/types';
 import { getNodeSprite, getNodeColor, getNodeLabel } from '@/systems/map';
+import { MapTooltip } from './MapTooltip';
 
-// Layout constants
-const NODE_RADIUS = 22;
-const H_SPACING = 72;   // horizontal space between node centres
-const V_SPACING = 72;   // vertical space between layers
-const PADDING = 48;     // SVG padding top/left/right/bottom
+// Layout constants — wider spread, compact vertically (no labels)
+const NODE_RADIUS = 20;
+const H_SPACING = 100;  // widened for visual breathing room
+const V_SPACING = 50;   // slightly wider vertical spread
+const PADDING = 40;
 
 interface MapCanvasProps {
   map: GeneratedMap;
@@ -47,36 +48,98 @@ function computeLayout(layers: MapNode[][]): {
   return { positions, svgWidth, svgHeight };
 }
 
-/** Single node circle + sprite/label */
+/**
+ * Desaturate a hex colour (make it grey-shifted) for visited nodes.
+ * Simple approach: blend toward a grey at same lightness.
+ */
+function desaturateHex(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const grey = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+  // 70% towards grey
+  const dr = Math.round(r * 0.3 + grey * 0.7);
+  const dg = Math.round(g * 0.3 + grey * 0.7);
+  const db = Math.round(b * 0.3 + grey * 0.7);
+  return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
+}
+
+/**
+ * Lighten a hex colour for the radial gradient highlight stop.
+ */
+function lightenHex(hex: string, amount = 0.35): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const lr = Math.min(255, Math.round(r + (255 - r) * amount));
+  const lg = Math.min(255, Math.round(g + (255 - g) * amount));
+  const lb = Math.min(255, Math.round(b + (255 - b) * amount));
+  return `#${lr.toString(16).padStart(2, '0')}${lg.toString(16).padStart(2, '0')}${lb.toString(16).padStart(2, '0')}`;
+}
+
+/**
+ * Darken a hex colour for the radial gradient shadow stop.
+ */
+function darkenHex(hex: string, amount = 0.35): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const dr = Math.max(0, Math.round(r * (1 - amount)));
+  const dg = Math.max(0, Math.round(g * (1 - amount)));
+  const db = Math.max(0, Math.round(b * (1 - amount)));
+  return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
+}
+
+/** Single node circle + sprite */
 function MapNodeCircle({
   layout,
+  isHovered,
+  onMouseEnter,
+  onMouseLeave,
   onNodeClick,
 }: {
   layout: NodeLayout;
+  isHovered: boolean;
+  onMouseEnter: (node: MapNode, e: React.MouseEvent<SVGGElement>) => void;
+  onMouseLeave: () => void;
   onNodeClick: (node: MapNode) => void;
 }) {
   const { node, cx, cy } = layout;
   const [imgError, setImgError] = useState(false);
 
   const sprite = getNodeSprite(node);
-  const color = getNodeColor(node);
+  const rawColor = getNodeColor(node);
   const label = getNodeLabel(node);
 
   const isAccessible = node.accessible && !node.visited;
   const isVisited = node.visited;
 
-  const opacity = isVisited ? 0.35 : isAccessible ? 1 : 0.55;
   const cursor = isAccessible ? 'cursor-pointer' : 'cursor-default';
 
-  const strokeColor = isAccessible ? '#f8d030' : 'rgba(255,255,255,0.4)';
-  const strokeWidth = isAccessible ? 2.5 : 1.5;
+  // Chip fill: desaturate for visited, radial gradient id per node
+  const gradientId = `ng-${node.id}`;
+  const baseColor = isVisited ? desaturateHex(rawColor) : rawColor;
+  const lightStop = lightenHex(baseColor);
+  const darkStop  = darkenHex(baseColor);
 
-  const pulseClass = isAccessible ? 'animate-blink' : '';
+  // Stroke colours
+  const strokeColor = isHovered ? '#e8c97e' : isAccessible ? '#c8a96e' : 'rgba(200,169,110,0.4)';
+  const strokeWidth = isAccessible || isHovered ? 2.5 : 1.5;
+  const strokeDash  = isVisited ? '4 2' : undefined;
+
+  // Hover transform applied on the <g>
+  const transform = isHovered
+    ? `translate(${cx} ${cy}) scale(1.08) translate(${-cx} ${-cy})`
+    : undefined;
 
   return (
     <g
       className={cursor}
+      transform={transform}
+      style={{ transition: 'transform 150ms ease-out' }}
       onClick={() => isAccessible && onNodeClick(node)}
+      onMouseEnter={(e) => onMouseEnter(node, e)}
+      onMouseLeave={onMouseLeave}
       role={isAccessible ? 'button' : undefined}
       aria-label={label}
       tabIndex={isAccessible ? 0 : undefined}
@@ -88,58 +151,87 @@ function MapNodeCircle({
           : undefined
       }
     >
-      {/* Accessible pulse ring */}
+      {/* Accessible pulse ring — breathing animation on r */}
       {isAccessible && (
         <circle
           cx={cx}
           cy={cy}
-          r={NODE_RADIUS + 4}
+          r={NODE_RADIUS + 5}
           fill="none"
-          stroke="#f8d030"
-          strokeWidth={1}
+          stroke="#c8a96e"
+          strokeWidth={1.5}
           opacity={0.5}
-          className={pulseClass}
+        >
+          <animate
+            attributeName="r"
+            values={`${NODE_RADIUS + 4};${NODE_RADIUS + 7};${NODE_RADIUS + 4}`}
+            dur="2.4s"
+            repeatCount="indefinite"
+          />
+          <animate
+            attributeName="opacity"
+            values="0.5;0.2;0.5"
+            dur="2.4s"
+            repeatCount="indefinite"
+          />
+        </circle>
+      )}
+
+      {/* Glow behind accessible nodes */}
+      {isAccessible && (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={NODE_RADIUS + 2}
+          fill="none"
+          stroke="#d97706"
+          strokeWidth={0.5}
+          opacity={0.3}
+          filter="url(#glow)"
         />
       )}
 
-      {/* Background circle */}
+      {/* Chip circle with radial gradient */}
       <circle
         cx={cx}
         cy={cy}
         r={NODE_RADIUS}
-        fill={color}
+        fill={`url(#${gradientId})`}
         stroke={strokeColor}
         strokeWidth={strokeWidth}
-        opacity={opacity}
+        strokeDasharray={strokeDash}
+        filter="url(#dropShadow)"
       />
 
       {/* Sprite or fallback */}
       {sprite && !imgError ? (
         <image
           href={sprite}
-          x={cx - NODE_RADIUS + 4}
-          y={cy - NODE_RADIUS + 4}
-          width={(NODE_RADIUS - 4) * 2}
-          height={(NODE_RADIUS - 4) * 2}
+          x={cx - NODE_RADIUS + 3}
+          y={cy - NODE_RADIUS + 3}
+          width={(NODE_RADIUS - 3) * 2}
+          height={(NODE_RADIUS - 3) * 2}
           preserveAspectRatio="xMidYMid meet"
-          opacity={opacity}
+          opacity={isVisited ? 0.5 : 1}
           style={{ imageRendering: 'pixelated' }}
           onError={() => setImgError(true)}
         />
       ) : null}
 
-      {/* Node label below the circle */}
-      <text
-        x={cx}
-        y={cy + NODE_RADIUS + 12}
-        textAnchor="middle"
-        fill={isVisited ? '#555' : isAccessible ? '#f8d030' : '#94a3b8'}
-        fontSize={8}
-        fontFamily='"Press Start 2P", cursive'
-        opacity={opacity}
-      >
-        {label.length > 12 ? label.slice(0, 12) + '…' : label}
-      </text>
+      {/* Per-node radial gradient def — rendered inside each g so it's scoped */}
+      <defs>
+        <radialGradient
+          id={gradientId}
+          cx="35%"
+          cy="30%"
+          r="65%"
+          fx="35%"
+          fy="30%"
+        >
+          <stop offset="0%" stopColor={lightStop} />
+          <stop offset="100%" stopColor={darkStop} />
+        </radialGradient>
+      </defs>
     </g>
   );
 }
@@ -160,50 +252,93 @@ export function MapCanvas({ map, onNodeClick }: MapCanvasProps) {
     [map.nodes, positions],
   );
 
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
+  const [tooltip, setTooltip] = useState<{
+    nodeType: string;
+    label: string;
+    position: { x: number; y: number };
+  } | null>(null);
+
+  function handleMouseEnter(node: MapNode, e: React.MouseEvent<SVGGElement>) {
+    setHoveredNodeId(node.id);
+    const rect = (e.currentTarget as SVGGElement).getBoundingClientRect();
+    setTooltip({
+      nodeType: node.type,
+      label: getNodeLabel(node),
+      position: { x: rect.right, y: rect.top },
+    });
+  }
+
+  function handleMouseLeave() {
+    setHoveredNodeId(null);
+    setTooltip(null);
+  }
+
   return (
-    <svg
-      viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-      width="100%"
-      height="100%"
-      style={{ maxHeight: '100%', display: 'block' }}
-      aria-label="Game map"
-    >
-      {/* Edges */}
-      <g>
-        {map.edges.map((edge) => {
-          const from = positions[edge.from];
-          const to = positions[edge.to];
-          if (!from || !to) return null;
+    <>
+      <svg
+        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+        className="w-full h-full"
+        preserveAspectRatio="xMidYMid meet"
+        aria-label="Game map"
+      >
+        {/* Global SVG filters */}
+        <defs>
+          <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="1" dy="2" stdDeviation="1" floodColor="#050805" floodOpacity="0.6" />
+          </filter>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feComposite in="blur" in2="SourceGraphic" operator="over" />
+          </filter>
+        </defs>
 
-          const fromNode = map.nodes[edge.from];
-          const toNode = map.nodes[edge.to];
-          const isActive =
-            fromNode?.visited && toNode && !toNode.visited;
+        {/* Edges */}
+        <g>
+          {map.edges.map((edge) => {
+            const from = positions[edge.from];
+            const to = positions[edge.to];
+            if (!from || !to) return null;
 
-          return (
-            <line
-              key={`${edge.from}-${edge.to}`}
-              x1={from.cx}
-              y1={from.cy}
-              x2={to.cx}
-              y2={to.cy}
-              stroke={isActive ? 'rgba(248,208,48,0.4)' : 'rgba(255,255,255,0.15)'}
-              strokeWidth={isActive ? 1.5 : 1}
+            const fromNode = map.nodes[edge.from];
+            const toNode = map.nodes[edge.to];
+            const isActive =
+              fromNode?.visited && toNode && !toNode.visited;
+
+            return (
+              <line
+                key={`${edge.from}-${edge.to}`}
+                x1={from.cx}
+                y1={from.cy}
+                x2={to.cx}
+                y2={to.cy}
+                stroke={isActive ? 'rgba(201,136,62,0.45)' : 'rgba(200,169,110,0.12)'}
+                strokeWidth={isActive ? 1.5 : 1}
+              />
+            );
+          })}
+        </g>
+
+        {/* Nodes (rendered after edges so they sit on top) */}
+        <g>
+          {nodeLayouts.map((layout) => (
+            <MapNodeCircle
+              key={layout.node.id}
+              layout={layout}
+              isHovered={hoveredNodeId === layout.node.id}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              onNodeClick={onNodeClick}
             />
-          );
-        })}
-      </g>
+          ))}
+        </g>
+      </svg>
 
-      {/* Nodes (rendered after edges so they sit on top) */}
-      <g>
-        {nodeLayouts.map((layout) => (
-          <MapNodeCircle
-            key={layout.node.id}
-            layout={layout}
-            onNodeClick={onNodeClick}
-          />
-        ))}
-      </g>
-    </svg>
+      <MapTooltip
+        nodeType={tooltip?.nodeType ?? ''}
+        label={tooltip?.label ?? ''}
+        position={tooltip?.position ?? null}
+      />
+    </>
   );
 }

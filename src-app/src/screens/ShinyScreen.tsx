@@ -9,13 +9,13 @@ export function ShinyScreen() {
   const shinyPokemon = (state.context.choices as unknown[])[0] as PokemonInstance | undefined;
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[#0a0a0f]">
+    <div className="screen-default flex flex-col h-full">
       {/* Header */}
-      <div className="bg-[#121827] border-b-2 border-white px-4 py-3 flex-shrink-0">
+      <div className="bg-[#161d14] border-b-2 border-[#c8a96e] px-4 py-3 flex-shrink-0">
         <h1 className="font-pixel text-[12px] text-yellow-400 text-center leading-[1.8]">
           A shiny Pokemon!
         </h1>
-        <p className="font-terminal text-[20px] text-[#94a3b8] text-center mt-1">
+        <p className="font-terminal text-[20px] text-[#c8a96e] text-center mt-1">
           ✦ Rare encounter! ✦
         </p>
       </div>
@@ -27,14 +27,14 @@ export function ShinyScreen() {
             <PokemonCard pokemon={shinyPokemon} />
           </div>
         ) : (
-          <span className="font-terminal text-[22px] text-white animate-blink">
+          <span className="font-terminal text-[22px] text-[#f0ead6] animate-blink">
             Loading...
           </span>
         )}
       </div>
 
       {/* Buttons */}
-      <div className="bg-[#121827] border-t-2 border-white px-4 py-3 flex justify-center gap-4 flex-shrink-0">
+      <div className="bg-[#161d14] border-t-2 border-[#c8a96e] px-4 py-3 flex justify-center gap-4 flex-shrink-0">
         <PixelButton
           variant="primary"
           disabled={!shinyPokemon}

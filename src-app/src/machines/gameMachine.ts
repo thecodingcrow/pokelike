@@ -317,24 +317,22 @@ export const gameMachine = setup({
       }
     },
 
-    healTeamAction: () => {
-      const gameStore = useGameStore.getState();
-      gameStore.healTeam();
-      const node = gameStore.currentNode;
-      if (node) gameStore.advanceNode(node.id);
+    healTeamAction: ({ context }: { context: MachineContext }) => {
+      useGameStore.getState().healTeam();
+      const node = context.currentNode;
+      if (node) useGameStore.getState().advanceNode(node.id);
       useUIStore.getState().showNotification('Your team was fully healed!');
     },
 
-    advanceCurrentNodeAction: () => {
-      const gameStore = useGameStore.getState();
-      const node = gameStore.currentNode;
-      if (node) gameStore.advanceNode(node.id);
+    advanceCurrentNodeAction: ({ context }: { context: MachineContext }) => {
+      const node = context.currentNode;
+      if (node) useGameStore.getState().advanceNode(node.id);
     },
 
-    addBadgeAction: () => {
+    addBadgeAction: ({ context }: { context: MachineContext }) => {
       const gameStore = useGameStore.getState();
       gameStore.incrementBadges();
-      const node = gameStore.currentNode;
+      const node = context.currentNode;
       if (node) gameStore.advanceNode(node.id);
       usePersistenceStore.getState().unlockAchievement(`gym_${gameStore.currentMap}`);
     },

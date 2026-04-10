@@ -16,7 +16,7 @@ export function TrainerSprite({ name, size = 80, local = false }: TrainerSpriteP
   if (error) {
     return (
       <div
-        className="flex items-center justify-center bg-[#1e2433] border-2 border-white font-pixel text-white"
+        className="flex items-center justify-center bg-[#161d14] border-2 border-[#c8a96e] font-pixel text-[#f0ead6]"
         style={{ width: size, height: size, fontSize: size * 0.4 }}
       >
         ?

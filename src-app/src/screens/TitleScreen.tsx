@@ -9,7 +9,7 @@ export function TitleScreen() {
   const openModal = useUIStore((s) => s.openModal);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh bg-game-bg px-4">
+    <div className="screen-title flex flex-col items-center justify-center h-full px-4">
       {/* Title */}
       <div className="mb-2 text-center">
         <h1
@@ -20,13 +20,13 @@ export function TitleScreen() {
         >
           P O K E L I K E
         </h1>
-        <p className="font-terminal text-[20px] text-[#94a3b8] mt-1">
+        <p className="font-terminal text-[20px] text-[#c8a96e] mt-1">
           A Pokemon Roguelike
         </p>
       </div>
 
       {/* Decorative separator */}
-      <div className="w-48 h-[2px] bg-white shadow-[0_0_4px_#dc2626] my-8" />
+      <div className="w-48 h-[2px] bg-[#c8a96e] shadow-[0_0_4px_#dc2626] my-8" />
 
       {/* Main action buttons */}
       <div className="flex flex-col gap-4 w-full max-w-[220px]">

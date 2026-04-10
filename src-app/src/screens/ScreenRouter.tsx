@@ -38,8 +38,8 @@ interface ScreenRouterProps {
 
 export function ScreenRouter({ screen }: ScreenRouterProps) {
   const Component = SCREEN_MAP[screen] ?? (() => (
-    <div className="flex items-center justify-center min-h-dvh bg-[#0a0a0f]">
-      <div className="font-pixel text-[10px] text-white border-2 border-white p-4 shadow-[4px_4px_0px_#000]">
+    <div className="screen-default flex items-center justify-center h-full">
+      <div className="font-pixel text-[10px] text-[#f0ead6] border-2 border-[#c8a96e] p-4 shadow-[4px_4px_0px_#050805]">
         Unknown: {screen}
       </div>
     </div>

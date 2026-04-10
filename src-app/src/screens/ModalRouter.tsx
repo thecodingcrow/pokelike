@@ -44,8 +44,8 @@ export function ModalRouter() {
       <div onClick={(e) => e.stopPropagation()}>
         {ModalContent ? <ModalContent /> : (
           <div className="fixed inset-0 flex items-center justify-center">
-            <div className="bg-[#121827] border-2 border-white p-6 shadow-[4px_4px_0px_#000]">
-              <div className="font-pixel text-[10px] text-white">Unknown modal: {modal}</div>
+            <div className="bg-[#161d14] border-2 border-[#c8a96e] p-6 shadow-[4px_4px_0px_#050805]">
+              <div className="font-pixel text-[10px] text-[#f0ead6]">Unknown modal: {modal}</div>
             </div>
           </div>
         )}

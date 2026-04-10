@@ -5,6 +5,25 @@ import { BattleField } from '@/components/battle/BattleField';
 import type { DetailedLogEvent } from '@/types/battle';
 import type { PokemonInstance } from '@/types/pokemon';
 
+// ── Derive a formatted battle title from the raw context strings ───────────
+function formatBattleTitle(title: string): string {
+  if (!title) return '';
+  const lower = title.toLowerCase();
+  if (lower.includes('gym') || lower.includes('leader')) {
+    // Already has gym/leader wording — reformat to "VS [LEADER] — GYM LEADER"
+    const match = title.match(/vs\s+(.+?)(?:\s*[!—–-].*)?$/i);
+    if (match) return `VS ${match[1].toUpperCase()} — GYM LEADER`;
+  }
+  if (lower.includes('wild')) return 'WILD POKÉMON';
+  if (lower.includes('trainer')) {
+    const match = title.match(/vs\s+(.+?)(?:\s*[!—–-].*)?$/i);
+    if (match) return `VS ${match[1].toUpperCase()}`;
+    return 'VS TRAINER';
+  }
+  // Boss / Elite Four — pass through uppercased
+  return title.toUpperCase();
+}
+
 export function BattleScreen() {
   const { state, send } = useGame();
   const battleResult = state.context.battleResult as {
@@ -30,39 +49,69 @@ export function BattleScreen() {
 
   if (!battleResult) {
     return (
-      <div className="flex items-center justify-center min-h-dvh bg-[#0a0a0f]">
-        <span className="font-terminal text-[22px] text-white animate-blink">
+      <div
+        className="screen-battle flex items-center justify-center h-full"
+        style={{ background: '#0d110e' }}
+      >
+        <span
+          className="font-terminal text-[22px] animate-blink"
+          style={{ color: '#f0ead6' }}
+        >
           Loading battle...
         </span>
       </div>
     );
   }
 
-  // Determine which Pokemon are currently active
-  const playerActiveIdx = playback.playerTeam.findIndex(p => p.currentHp > 0);
-  const enemyActiveIdx  = playback.enemyTeam.findIndex(p => p.currentHp > 0);
+  // Determine which Pokémon are currently active (first with HP > 0)
+  const playerActiveIdx = Math.max(
+    0,
+    playback.playerTeam.findIndex(p => p.currentHp > 0),
+  );
+  const enemyActiveIdx = Math.max(
+    0,
+    playback.enemyTeam.findIndex(p => p.currentHp > 0),
+  );
 
-  // Header strip
-  const battleTitle    = (state.context.battleTitle as string)    ?? '';
-  const battleSubtitle = (state.context.battleSubtitle as string) ?? '';
+  // Battle title header
+  const rawTitle    = (state.context.battleTitle    as string) ?? '';
+  const battleTitle = formatBattleTitle(rawTitle);
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[#0a0a0f]">
-      {/* Header */}
-      {(battleTitle || battleSubtitle) && (
-        <div className="bg-[#121827] border-b-2 border-white px-4 py-2 flex items-center justify-between flex-shrink-0">
-          <span className="font-pixel text-[10px] text-white truncate">{battleTitle}</span>
-          <span className="font-terminal text-[18px] text-[#94a3b8]">{battleSubtitle}</span>
+    <div
+      className="screen-battle flex flex-col h-full"
+      style={{ background: '#0d110e' }}
+    >
+      {/* ── Battle title header ──────────────────────────────────────────── */}
+      {battleTitle && (
+        <div
+          className="flex-shrink-0 flex items-center justify-center px-4 py-2"
+          style={{
+            background: '#161d14',
+            borderBottom: '2px solid #c8a96e',
+          }}
+        >
+          <span
+            className="font-pixel text-center truncate"
+            style={{
+              fontSize: 10,
+              color: '#c8a96e',
+              textShadow: '1px 1px 0 #050805, 0 0 12px #c8a96e44',
+              letterSpacing: '0.08em',
+            }}
+          >
+            {battleTitle}
+          </span>
         </div>
       )}
 
-      {/* BattleField fills remaining space */}
+      {/* ── BattleField fills remaining space ───────────────────────────── */}
       <div className="flex-1" style={{ minHeight: 0 }}>
         <BattleField
           playerTeam={playback.playerTeam}
           enemyTeam={playback.enemyTeam}
-          playerActiveIdx={Math.max(0, playerActiveIdx)}
-          enemyActiveIdx={Math.max(0, enemyActiveIdx)}
+          playerActiveIdx={playerActiveIdx}
+          enemyActiveIdx={enemyActiveIdx}
           currentEvent={playback.currentEvent}
           logMessages={playback.logMessages}
           isComplete={playback.isComplete}

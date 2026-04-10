@@ -24,7 +24,7 @@ export function ItemBar({ items, onItemClick }: ItemBarProps) {
           return (
             <button
               key={`${item.id}-${i}`}
-              className="w-8 h-8 flex items-center justify-center border border-white/40 bg-[#1e2433] hover:border-white transition-none cursor-pointer"
+              className="w-8 h-8 flex items-center justify-center border border-[#c8a96e]/40 bg-[#161d14] hover:border-[#c8a96e] transition-none cursor-pointer"
               onClick={() => onItemClick(item, i)}
               onMouseEnter={(e) => handleMouseEnter(item, e)}
               onMouseLeave={() => setTooltip(null)}
@@ -51,7 +51,7 @@ export function ItemBar({ items, onItemClick }: ItemBarProps) {
       {/* Tooltip */}
       {tooltip && (
         <div
-          className="fixed z-50 pointer-events-none font-pixel text-[8px] text-white bg-[#121827] border border-white px-2 py-1 shadow-[2px_2px_0px_#000] -translate-x-1/2"
+          className="fixed z-50 pointer-events-none font-pixel text-[8px] text-[#f0ead6] bg-[#161d14] border border-[#c8a96e] px-2 py-1 shadow-[2px_2px_0px_#050805] -translate-x-1/2"
           style={{ left: tooltip.x, top: tooltip.y - 28 }}
         >
           {tooltip.text}

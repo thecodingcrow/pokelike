@@ -20,7 +20,7 @@ export function HpBar({ current, max, label, showNumbers = false }: HpBarProps) 
   return (
     <div style={{ imageRendering: 'pixelated' }}>
       {label && (
-        <div className="font-pixel text-[8px] text-white mb-1 uppercase">
+        <div className="font-pixel text-[8px] text-[#f0ead6] mb-1 uppercase">
           {label}
         </div>
       )}
@@ -34,7 +34,7 @@ export function HpBar({ current, max, label, showNumbers = false }: HpBarProps) 
         />
       </div>
       {showNumbers && (
-        <div className="font-mono text-[10px] text-white mt-0.5 text-right">
+        <div className="font-mono text-[10px] text-[#f0ead6] mt-0.5 text-right">
           {fmt(current)}/{fmt(max)}
         </div>
       )}

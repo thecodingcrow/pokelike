@@ -12,7 +12,7 @@ export function GameOverScreen() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-dvh bg-game-bg px-4 gap-8"
+      className="screen-default flex flex-col items-center justify-center h-full px-4 gap-8 overflow-y-auto"
       style={{ filter: 'saturate(0.6) brightness(0.85)' }}
     >
       {/* Title */}
@@ -24,26 +24,26 @@ export function GameOverScreen() {
       </h1>
 
       {/* Stats panel */}
-      <div className="bg-game-panel border-2 border-white shadow-[4px_4px_0px_#000] p-6 flex flex-col gap-4 w-full max-w-[320px]">
+      <div className="bg-game-panel border-2 border-[#c8a96e] shadow-[4px_4px_0px_#050805] p-6 flex flex-col gap-4 w-full max-w-[320px]">
 
         {/* Badges */}
         <div className="flex flex-col gap-2">
-          <p className="font-pixel text-[10px] text-[#94a3b8]">BADGES: {badges}/8</p>
+          <p className="font-pixel text-[10px] text-[#c8a96e]">BADGES: {badges}/8</p>
           <BadgeBar badges={badges} />
         </div>
 
         {/* Maps cleared */}
-        <div className="border-t border-white/10 pt-3">
-          <p className="font-pixel text-[10px] text-[#94a3b8]">
+        <div className="border-t border-[#c8a96e]/10 pt-3">
+          <p className="font-pixel text-[10px] text-[#c8a96e]">
             MAPS CLEARED:{' '}
-            <span className="text-white">{currentMap}</span>
+            <span className="text-[#f0ead6]">{currentMap}</span>
           </p>
         </div>
       </div>
 
       {/* Final team */}
       <div className="flex flex-col items-center gap-3">
-        <p className="font-pixel text-[10px] text-[#94a3b8]">FINAL TEAM:</p>
+        <p className="font-pixel text-[10px] text-[#c8a96e]">FINAL TEAM:</p>
         <TeamBar team={team} readonly />
       </div>
 

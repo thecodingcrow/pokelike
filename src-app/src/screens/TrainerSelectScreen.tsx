@@ -28,11 +28,11 @@ function TrainerCard({ trainer, label, spriteName, selected, onSelect }: Trainer
         'transition-none',
         'hover:-translate-y-1 hover:shadow-pixel-lg',
         'active:translate-y-0.5 active:shadow-none',
-        selected ? 'border-[#f8d030]' : 'border-white',
+        selected ? 'border-[#f8d030]' : 'border-[#c8a96e]',
       ].join(' ')}
     >
       <TrainerSprite name={spriteName} size={96} />
-      <span className="font-terminal text-[24px] text-white tracking-wide">
+      <span className="font-terminal text-[24px] text-[#f0ead6] tracking-wide">
         {label}
       </span>
     </div>
@@ -52,8 +52,8 @@ export function TrainerSelectScreen() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh bg-game-bg px-6 gap-10">
-      <h2 className="font-pixel text-[12px] text-white leading-[1.8] text-center">
+    <div className="screen-default flex flex-col items-center justify-center h-full px-6 gap-10">
+      <h2 className="font-pixel text-[12px] text-[#f0ead6] leading-[1.8] text-center">
         Choose your trainer
       </h2>
 
