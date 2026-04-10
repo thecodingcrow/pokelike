@@ -35,7 +35,15 @@ export function MoveTutorModal() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center">
-      <div className="w-full max-w-[480px] bg-[#0d110e] border-t-4 border-[#c8a96e] shadow-[0_-4px_0_#050805] p-6 pb-8 max-h-[80vh] overflow-y-auto">
+      <div className="w-full max-w-[480px] bg-[#0d110e] border-t-4 border-[#c8a96e] shadow-[0_-4px_0_#050805] p-6 pb-8 max-h-[80vh] overflow-y-auto relative">
+        {/* X close button */}
+        <button
+          onClick={closeModal}
+          className="absolute top-3 right-3 w-11 h-11 flex items-center justify-center border-2 border-[#c8a96e] bg-[#161d14] text-[#f0ead6] font-pixel text-[12px] cursor-pointer z-10 shadow-[2px_2px_0px_#050805] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#050805]"
+          aria-label="Close"
+        >
+          ✕
+        </button>
         {/* Header */}
         <div className="font-pixel text-[12px] text-[#f0ead6] mb-1">MOVE TUTOR</div>
         <div className="font-terminal text-[18px] text-[#c8a96e] mb-4">

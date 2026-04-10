@@ -18,6 +18,7 @@ export function PokemonCard({ pokemon, onClick, selected, compact }: PokemonCard
       className={[
         'bg-[#161d14] border-2 p-3 shadow-[3px_3px_0px_#050805]',
         selected ? 'border-[#e8c97e] shadow-[0_0_12px_rgba(200,169,110,0.3)]' : 'border-[#c8a96e]',
+        pokemon.isShiny ? 'shadow-[0_0_8px_rgba(248,208,48,0.4)]' : '',
         onClick ? 'cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-3px] hover:shadow-[5px_5px_0px_#050805] transition-all duration-150 ease-out' : '',
       ].join(' ')}
       onClick={onClick}
@@ -25,8 +26,19 @@ export function PokemonCard({ pokemon, onClick, selected, compact }: PokemonCard
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
     >
+      {/* Shiny label */}
+      {pokemon.isShiny && (
+        <div
+          className="font-pixel text-center mb-1"
+          style={{ fontSize: 8, color: '#f8d030' }}
+          aria-label="Shiny pokemon"
+        >
+          ✦ SHINY
+        </div>
+      )}
+
       {/* Sprite */}
-      <div className="flex justify-center mb-1">
+      <div className={['flex justify-center mb-1', pokemon.isShiny ? 'shiny-sparkle' : ''].join(' ')}>
         <img
           src={pokemon.spriteUrl}
           alt={displayName}

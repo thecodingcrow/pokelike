@@ -1,7 +1,7 @@
 import { useGame } from '@/hooks/useGame';
 import { useGameStore } from '@/store/gameStore';
 import { BadgeBar } from '@/components/hud/BadgeBar';
-import { TeamBar } from '@/components/hud/TeamBar';
+import { HpBar } from '@/components/battle/HpBar';
 import { PixelButton } from '@/components/ui/PixelButton';
 
 export function GameOverScreen() {
@@ -11,10 +11,7 @@ export function GameOverScreen() {
   const team = useGameStore((s) => s.team);
 
   return (
-    <div
-      className="screen-default flex flex-col items-center justify-center h-full px-4 gap-8 overflow-y-auto"
-      style={{ filter: 'saturate(0.6) brightness(0.85)' }}
-    >
+    <div className="screen-default flex flex-col items-center justify-center h-full px-4 gap-8 overflow-y-auto">
       {/* Title */}
       <h1
         className="font-pixel text-[20px] leading-[1.8] text-neon-red text-center"
@@ -41,11 +38,62 @@ export function GameOverScreen() {
         </div>
       </div>
 
-      {/* Final team */}
-      <div className="flex flex-col items-center gap-3">
-        <p className="font-pixel text-[10px] text-[#c8a96e]">FINAL TEAM:</p>
-        <TeamBar team={team} readonly />
-      </div>
+      {/* Final team — shown in full color as a memorial */}
+      {team.length > 0 && (
+        <div className="flex flex-col items-center gap-4 w-full max-w-[360px]">
+          <p className="font-pixel text-[10px] text-[#c8a96e]">FINAL TEAM:</p>
+          <div className="grid grid-cols-3 gap-3 w-full">
+            {team.map((pokemon, i) => {
+              const displayName = pokemon.nickname ?? pokemon.name;
+              const spriteUrl = pokemon.isShiny
+                ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.speciesId}.png`
+                : (pokemon.spriteUrl || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.speciesId}.png`);
+              return (
+                <div
+                  key={i}
+                  className="flex flex-col items-center bg-[#161d14] border-2 border-[#c8a96e] shadow-[2px_2px_0px_#050805] p-2 gap-1"
+                >
+                  {/* Sprite — full color, no grayscale */}
+                  <div className="relative">
+                    <img
+                      src={spriteUrl}
+                      alt={displayName}
+                      width={64}
+                      height={64}
+                      className="w-16 h-16"
+                      style={{ imageRendering: 'pixelated' }}
+                    />
+                    {pokemon.isShiny && (
+                      <span
+                        className="absolute top-0 right-0 leading-none"
+                        style={{ color: '#f8d030', fontSize: 10 }}
+                        aria-label="Shiny"
+                      >
+                        ✦
+                      </span>
+                    )}
+                  </div>
+                  {/* Name */}
+                  <div
+                    className="font-pixel text-center leading-tight truncate w-full"
+                    style={{ fontSize: 16, color: '#f0ead6' }}
+                  >
+                    {displayName.toUpperCase()}
+                  </div>
+                  {/* Level */}
+                  <div className="font-mono" style={{ fontSize: 11, color: '#c8a96e' }}>
+                    Lv.{pokemon.level}
+                  </div>
+                  {/* HP bar */}
+                  <div className="w-full mt-0.5">
+                    <HpBar current={pokemon.currentHp} max={pokemon.maxHp} showNumbers />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Try Again */}
       <PixelButton

@@ -108,6 +108,9 @@ export function useBattlePlayback(
 
   const start = useCallback(() => {
     cancelRef.current = false;
+    // Always reset speed to 1× at the start of a new battle so that
+    // skipping a previous battle doesn't carry the fast speed into the next one.
+    speedRef.current = 1;
 
     setState(prev => ({
       ...prev,
@@ -118,6 +121,7 @@ export function useBattlePlayback(
       logMessages: [],
       playerTeam: pTeam.map(p => ({ ...p })),
       enemyTeam: eTeam.map(p => ({ ...p })),
+      speedMultiplier: 1,
     }));
 
     const run = async () => {
@@ -192,8 +196,11 @@ export function useBattlePlayback(
   }, [detailedLog, pTeam, eTeam]);
 
   const skip = useCallback(() => {
-    speedRef.current = 3;
-    setState(prev => ({ ...prev, speedMultiplier: 3 }));
+    // 2× speed — fast enough to feel skipped, slow enough to still read events.
+    // (Was 3× which was too aggressive, especially for the question-mark and
+    // end-game battles where the tester reported events flashing by.)
+    speedRef.current = 2;
+    setState(prev => ({ ...prev, speedMultiplier: 2 }));
   }, []);
 
   const skipAll = useCallback(() => {

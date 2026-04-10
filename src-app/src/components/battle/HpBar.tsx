@@ -24,12 +24,27 @@ export function HpBar({ current, max, label, showNumbers = false }: HpBarProps) 
           {label}
         </div>
       )}
-      <div className="hp-bar-container">
+      {/* Inline styles duplicate the CSS class as a hard fallback so the bar
+          renders correctly at any width, including the 56px roster slot on
+          mobile where CSS class application may race against first paint. */}
+      <div
+        className="hp-bar-container"
+        style={{
+          border: '2px solid #c8a96e',
+          height: '8px',
+          background: '#0f1410',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
+          width: '100%',
+        }}
+      >
         <div
-          className={`hp-bar-fill${isLow ? ' animate-blink-fast' : ''}`}
+          className={isLow ? 'animate-blink-fast' : undefined}
           style={{
             width: `${pct}%`,
+            height: '100%',
             backgroundColor: barColor,
+            display: 'block',
           }}
         />
       </div>

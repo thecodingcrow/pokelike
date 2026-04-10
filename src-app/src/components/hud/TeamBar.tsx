@@ -51,8 +51,12 @@ export function TeamBar({ team, readonly: isReadonly = false, onReorder, layout 
           <div
             key={i}
             className={[
-              'flex flex-col items-center gap-0.5 p-1 border-2',
-              pokemon ? 'border-[#c8a96e]' : 'border-[#5a6a4a]/30 bg-[#161d14]',
+              'flex flex-col items-center gap-0.5 p-1 border-2 relative',
+              pokemon
+                ? pokemon.isShiny
+                  ? 'border-[#f8d030]'
+                  : 'border-[#c8a96e]'
+                : 'border-[#5a6a4a]/30 bg-[#161d14]',
               !isReadonly && pokemon ? 'cursor-grab' : '',
             ].join(' ')}
             style={{ width: 44, minHeight: 44 }}
@@ -74,6 +78,16 @@ export function TeamBar({ team, readonly: isReadonly = false, onReorder, layout 
                     filter: pokemon.currentHp <= 0 ? 'grayscale(1)' : 'none',
                   }}
                 />
+                {/* Shiny star indicator */}
+                {pokemon.isShiny && (
+                  <span
+                    className="absolute top-0 right-0 leading-none pointer-events-none"
+                    style={{ color: '#f8d030', fontSize: 10 }}
+                    aria-label="Shiny"
+                  >
+                    ✦
+                  </span>
+                )}
                 {/* HP indicator dot */}
                 <div
                   className="w-2 h-2 border border-[#050805]"
