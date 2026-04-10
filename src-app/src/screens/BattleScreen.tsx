@@ -115,7 +115,7 @@ export function BattleScreen() {
           currentEvent={playback.currentEvent}
           logMessages={playback.logMessages}
           isComplete={playback.isComplete}
-          onSkip={() => playback.skip()}
+          onSkip={() => { playback.skipAll(); send({ type: 'SKIP' }); }}
           onContinue={() => send({ type: 'CONTINUE' })}
         />
       </div>
