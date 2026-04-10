@@ -76,10 +76,19 @@ export const useGameStore = create<GameStore>((set) => ({
 
   setTrainer: (trainer) => set({ trainer }),
 
-  setTeam: (team) => set({ team }),
+  setTeam: (team) => set((s) => ({
+    team,
+    maxTeamSize: Math.max(s.maxTeamSize, team.length),
+  })),
 
   addToTeam: (pokemon) =>
-    set((s) => ({ team: [...s.team, pokemon] })),
+    set((s) => {
+      const newTeam = [...s.team, pokemon];
+      return {
+        team: newTeam,
+        maxTeamSize: Math.max(s.maxTeamSize, newTeam.length),
+      };
+    }),
 
   swapTeamMember: (idx, pokemon) =>
     set((s) => {
@@ -98,14 +107,14 @@ export const useGameStore = create<GameStore>((set) => ({
 
   equipItem: (item, pokemonIdx) =>
     set((s) => {
-      // Remove the item from the bag
       const itemBagIdx = s.items.indexOf(item);
       if (itemBagIdx === -1) return {};
-      const items = s.items.filter((_, i) => i !== itemBagIdx);
 
-      // Equip it onto the Pokemon
+      // Check the target pokemon exists BEFORE removing the item
       const team = [...s.team];
-      if (!team[pokemonIdx]) return { items };
+      if (!team[pokemonIdx]) return {};
+
+      const items = s.items.filter((_, i) => i !== itemBagIdx);
       team[pokemonIdx] = {
         ...team[pokemonIdx],
         heldItem: { id: item.id, name: item.name, icon: item.icon },

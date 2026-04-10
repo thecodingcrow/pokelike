@@ -482,6 +482,196 @@ describe('gameMachine', () => {
 
   // ── Test 24: Elite Four intermediate victory — goes to transition ───────────
 
+  // ── Test 25–26: Swap flow actually swaps / skip discards ───────────────────
+
+  it('swap MAKE_CHOICE replaces team member and trims to 6', async () => {
+    const actor = createTestActor();
+    await advanceToMap(actor);
+
+    // Fill team to 6
+    for (let i = 0; i < 5; i++) {
+      useGameStore.getState().addToTeam(makePokemon({ name: `Mon${i}` }));
+    }
+    expect(useGameStore.getState().team).toHaveLength(6);
+
+    const catchNode = makeMapNode({ id: 'catch-swap', type: 'catch' });
+    actor.send({ type: 'CLICK_NODE', node: catchNode });
+    await waitFor(actor, (s) => s.value === 'catch', { timeout: 1000 });
+
+    const newMon = makePokemon({ speciesId: 25, name: 'Pikachu' });
+    actor.send({ type: 'MAKE_CHOICE', pokemon: newMon });
+
+    // Should be in swap now with 7 members
+    expect(actor.getSnapshot().value).toBe('swap');
+    expect(useGameStore.getState().team).toHaveLength(7);
+
+    // Replace slot 0 with the new pokemon (it's at index 6)
+    actor.send({ type: 'MAKE_CHOICE', index: 0 });
+    expect(actor.getSnapshot().value).toBe('map');
+
+    const finalTeam = useGameStore.getState().team;
+    expect(finalTeam).toHaveLength(6);
+    expect(finalTeam[0].name).toBe('Pikachu');
+  });
+
+  it('swap SKIP discards new pokemon and keeps team at 6', async () => {
+    const actor = createTestActor();
+    await advanceToMap(actor);
+
+    // Fill team to 6
+    for (let i = 0; i < 5; i++) {
+      useGameStore.getState().addToTeam(makePokemon({ name: `Mon${i}` }));
+    }
+    expect(useGameStore.getState().team).toHaveLength(6);
+    const originalFirst = useGameStore.getState().team[0].name;
+
+    const catchNode = makeMapNode({ id: 'catch-skip', type: 'catch' });
+    actor.send({ type: 'CLICK_NODE', node: catchNode });
+    await waitFor(actor, (s) => s.value === 'catch', { timeout: 1000 });
+
+    const newMon = makePokemon({ speciesId: 25, name: 'Pikachu' });
+    actor.send({ type: 'MAKE_CHOICE', pokemon: newMon });
+    expect(actor.getSnapshot().value).toBe('swap');
+
+    actor.send({ type: 'SKIP' });
+    expect(actor.getSnapshot().value).toBe('map');
+
+    const finalTeam = useGameStore.getState().team;
+    expect(finalTeam).toHaveLength(6);
+    // Original team members preserved
+    expect(finalTeam[0].name).toBe(originalFirst);
+    // Pikachu should NOT be in the team
+    expect(finalTeam.find(p => p.name === 'Pikachu')).toBeUndefined();
+  });
+
+  // ── Test 27–28: Pokédex tracking via catchPokemonAction ────────────────────
+
+  it('catching a pokemon marks it caught in pokedex', async () => {
+    const actor = createTestActor();
+    await advanceToMap(actor);
+
+    const catchNode = makeMapNode({ type: 'catch' });
+    actor.send({ type: 'CLICK_NODE', node: catchNode });
+    await waitFor(actor, (s) => s.value === 'catch', { timeout: 1000 });
+
+    const pikachu = makePokemon({ speciesId: 25, name: 'Pikachu' });
+    actor.send({ type: 'MAKE_CHOICE', pokemon: pikachu });
+
+    expect(actor.getSnapshot().value).toBe('map');
+    const pokedex = usePersistenceStore.getState().pokedex;
+    expect(pokedex[25]).toBeDefined();
+    expect(pokedex[25].caught).toBe(true);
+  });
+
+  it('catching a shiny pokemon marks it in shinydex', async () => {
+    const actor = createTestActor();
+    await advanceToMap(actor);
+
+    const catchNode = makeMapNode({ type: 'catch' });
+    actor.send({ type: 'CLICK_NODE', node: catchNode });
+    await waitFor(actor, (s) => s.value === 'catch', { timeout: 1000 });
+
+    const shinyMon = makePokemon({ speciesId: 25, name: 'Pikachu', isShiny: true });
+    actor.send({ type: 'MAKE_CHOICE', pokemon: shinyMon });
+
+    expect(actor.getSnapshot().value).toBe('map');
+    const shinydex = usePersistenceStore.getState().shinydex;
+    expect(shinydex[25]).toBeDefined();
+  });
+
+  // ── Test 29: solo_run only unlocks when maxTeamSize stayed 1 ───────────────
+
+  it('solo_run only unlocks when maxTeamSize stayed at 1', async () => {
+    // Win with team size 1 — solo_run should unlock
+    const soloActor = createTestActor({
+      runBattle: fromPromise(async () => ({
+        playerWon: true,
+        pTeam: useGameStore.getState().team,
+        eTeam: [makePokemon({ currentHp: 0 })],
+        playerParticipants: new Set([0]),
+        detailedLog: [],
+        eliteComplete: true,
+        battleTitle: '',
+        battleSubtitle: '',
+      })),
+    });
+    await advanceToMap(soloActor);
+    // team is already 1 (just the starter)
+    expect(useGameStore.getState().team).toHaveLength(1);
+    expect(useGameStore.getState().maxTeamSize).toBe(1);
+
+    useGameStore.getState().startMap(8);
+    soloActor.send({ type: 'CLICK_NODE', node: makeMapNode({ type: 'boss' }) });
+    await waitFor(soloActor, (s) => s.value === 'win', { timeout: 3000 });
+
+    expect(usePersistenceStore.getState().achievements).toContain('solo_run');
+  });
+
+  it('solo_run does NOT unlock when team had 2+ members', async () => {
+    const multiActor = createTestActor({
+      runBattle: fromPromise(async () => ({
+        playerWon: true,
+        pTeam: useGameStore.getState().team,
+        eTeam: [makePokemon({ currentHp: 0 })],
+        playerParticipants: new Set([0]),
+        detailedLog: [],
+        eliteComplete: true,
+        battleTitle: '',
+        battleSubtitle: '',
+      })),
+    });
+    await advanceToMap(multiActor);
+    // Add a second pokemon so maxTeamSize becomes 2
+    useGameStore.getState().addToTeam(makePokemon({ name: 'Extra' }));
+    expect(useGameStore.getState().maxTeamSize).toBe(2);
+
+    useGameStore.getState().startMap(8);
+    multiActor.send({ type: 'CLICK_NODE', node: makeMapNode({ type: 'boss' }) });
+    await waitFor(multiActor, (s) => s.value === 'win', { timeout: 3000 });
+
+    expect(usePersistenceStore.getState().achievements).not.toContain('solo_run');
+  });
+
+  // ── Test 30: gym achievements unlock per map ───────────────────────────────
+
+  it('gym achievement unlocks when boss is beaten on map 0', async () => {
+    const actor = createTestActor();
+    await advanceToMap(actor);
+
+    const bossNode = makeMapNode({ type: 'boss' });
+    actor.send({ type: 'CLICK_NODE', node: bossNode });
+
+    await waitFor(actor, (s) => s.value === 'badge', { timeout: 2000 });
+
+    expect(usePersistenceStore.getState().achievements).toContain('gym_0');
+  });
+
+  // ── Test 31: starter achievement unlocks on win ─────────────────────────────
+
+  it('starter achievement unlocks on elite four win', async () => {
+    const actor = createTestActor({
+      runBattle: fromPromise(async () => ({
+        playerWon: true,
+        pTeam: useGameStore.getState().team,
+        eTeam: [makePokemon({ currentHp: 0 })],
+        playerParticipants: new Set([0]),
+        detailedLog: [],
+        eliteComplete: true,
+        battleTitle: '',
+        battleSubtitle: '',
+      })),
+    });
+    await advanceToMap(actor);
+    // advanceToMap uses speciesId 1 (Bulbasaur) as the starter
+    expect(useGameStore.getState().starterSpeciesId).toBe(1);
+
+    useGameStore.getState().startMap(8);
+    actor.send({ type: 'CLICK_NODE', node: makeMapNode({ type: 'boss' }) });
+    await waitFor(actor, (s) => s.value === 'win', { timeout: 3000 });
+
+    expect(usePersistenceStore.getState().achievements).toContain('starter_1');
+  });
+
   it('elite four — intermediate victory goes to transition then battle', async () => {
     const actor = createTestActor({
       runBattle: fromPromise(async () => ({

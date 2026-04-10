@@ -315,6 +315,11 @@ export const gameMachine = setup({
       if (starter.isShiny) {
         persist.markShinyCaught(starter.speciesId, starter.name, starter.types, starter.spriteUrl);
       }
+
+      // Check dex completion achievements (unlikely on starter, but correct)
+      if (persist.isPokedexComplete()) {
+        persist.unlockAchievement('pokedex_complete');
+      }
     },
 
     healTeamAction: ({ context }: { context: MachineContext }) => {
@@ -397,6 +402,14 @@ export const gameMachine = setup({
       if (pokemon.isShiny) {
         persist.markShinyCaught(pokemon.speciesId, pokemon.name, pokemon.types, pokemon.spriteUrl);
       }
+
+      // Check dex completion achievements
+      if (persist.isPokedexComplete()) {
+        persist.unlockAchievement('pokedex_complete');
+      }
+      if (pokemon.isShiny && persist.isShinyDexComplete()) {
+        persist.unlockAchievement('shinydex_complete');
+      }
     },
 
     /**
@@ -407,6 +420,35 @@ export const gameMachine = setup({
       const item = event.item;
       if (!item) return;
       useGameStore.getState().addItem(item);
+    },
+
+    /**
+     * Swap the team member at the chosen index with the just-caught pokemon
+     * (which is currently sitting at the end of the team as team[6]), then
+     * trim the team back to 6.
+     */
+    swapTeamAction: ({ event }: { event: MachineEvents }) => {
+      if (event.type !== 'MAKE_CHOICE') return;
+      const idx = event.index;
+      if (idx === undefined) return;
+      const store = useGameStore.getState();
+      const { team } = store;
+      if (team.length <= 6) return;
+      const newPokemon = team[team.length - 1];
+      store.swapTeamMember(idx, newPokemon);
+      const updatedTeam = useGameStore.getState().team;
+      store.setTeam(updatedTeam.slice(0, 6));
+    },
+
+    /**
+     * Cancel a swap — discard the just-caught pokemon by trimming the team
+     * back to 6 (the newly caught pokemon was appended at the end).
+     */
+    cancelSwapAction: () => {
+      const store = useGameStore.getState();
+      if (store.team.length > 6) {
+        store.setTeam(store.team.slice(0, 6));
+      }
     },
   },
 
@@ -492,6 +534,12 @@ export const gameMachine = setup({
       }
 
       const result = runBattle(team, enemyTeam, items, []);
+
+      // Mark all enemy pokemon as seen in the pokédex
+      for (const enemy of enemyTeam) {
+        const normalUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${enemy.speciesId}.png`;
+        usePersistenceStore.getState().markSeen(enemy.speciesId, enemy.name, enemy.types, normalUrl);
+      }
 
       if (result.playerWon) {
         // Match original getLevelGain logic exactly:
@@ -797,11 +845,11 @@ export const gameMachine = setup({
       on: {
         MAKE_CHOICE: {
           target: 'map',
-          actions: 'advanceCurrentNodeAction',
+          actions: ['swapTeamAction', 'advanceCurrentNodeAction'],
         },
         SKIP: {
           target: 'map',
-          actions: 'advanceCurrentNodeAction',
+          actions: ['cancelSwapAction', 'advanceCurrentNodeAction'],
         },
       },
     },

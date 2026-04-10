@@ -179,8 +179,41 @@ describe('gameStore', () => {
       const item = makeFullItem('life_orb');
       useGameStore.getState().addItem(item);
       useGameStore.getState().equipItem(item, 99);
-      // item is removed from bag, but no pokemon gets it — aligns with store impl
-      expect(useGameStore.getState().items).toHaveLength(0);
+      // item stays in bag — target pokemon does not exist
+      expect(useGameStore.getState().items).toHaveLength(1);
+    });
+  });
+
+  // ── maxTeamSize tracking ──────────────────────────────────────────────────
+
+  describe('maxTeamSize tracking', () => {
+    it('addToTeam updates maxTeamSize', () => {
+      useGameStore.getState().addToTeam(makePokemon());
+      expect(useGameStore.getState().maxTeamSize).toBe(1);
+      useGameStore.getState().addToTeam(makePokemon());
+      expect(useGameStore.getState().maxTeamSize).toBe(2);
+    });
+
+    it('maxTeamSize does not decrease when pokemon removed via setTeam', () => {
+      useGameStore.getState().addToTeam(makePokemon());
+      useGameStore.getState().addToTeam(makePokemon());
+      expect(useGameStore.getState().maxTeamSize).toBe(2);
+      useGameStore.getState().setTeam([makePokemon()]); // trim to 1
+      expect(useGameStore.getState().maxTeamSize).toBe(2); // stays at peak
+    });
+
+    it('resetRun resets maxTeamSize to 1', () => {
+      useGameStore.getState().addToTeam(makePokemon());
+      useGameStore.getState().addToTeam(makePokemon());
+      expect(useGameStore.getState().maxTeamSize).toBe(2);
+      useGameStore.getState().resetRun(false);
+      expect(useGameStore.getState().maxTeamSize).toBe(1);
+    });
+
+    it('setTeam with larger team increases maxTeamSize', () => {
+      const bigTeam = [makePokemon(), makePokemon(), makePokemon()];
+      useGameStore.getState().setTeam(bigTeam);
+      expect(useGameStore.getState().maxTeamSize).toBe(3);
     });
   });
 
