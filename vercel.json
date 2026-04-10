@@ -1,6 +1,4 @@
 {
-  "installCommand": "cd src-app && pnpm install",
-  "buildCommand": "cd src-app && pnpm build",
-  "outputDirectory": "src-app/dist",
+  "rootDirectory": "src-app",
   "framework": "vite"
 }
