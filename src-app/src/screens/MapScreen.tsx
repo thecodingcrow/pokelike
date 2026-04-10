@@ -186,12 +186,18 @@ export function MapScreen() {
           {/* ── Mobile / tablet floating overlays (hidden on desktop) ──────── */}
 
           {/* Top-left: badges */}
-          <div className="map-float-badges absolute top-3 left-3 z-10">
+          <div
+            className="map-float-badges absolute left-3 z-10"
+            style={{ top: 'max(12px, env(safe-area-inset-top, 12px))' }}
+          >
             <BadgeBar badges={badges} />
           </div>
 
           {/* Top-right: icon buttons */}
-          <div className="map-float-actions absolute top-3 right-3 z-10 flex items-center gap-2">
+          <div
+            className="map-float-actions absolute right-3 z-10 flex items-center gap-2"
+            style={{ top: 'max(12px, env(safe-area-inset-top, 12px))' }}
+          >
             <span className="font-terminal text-[11px] text-[#c8a96e]/60 hidden sm:inline">
               {mapLabel}
             </span>
@@ -204,7 +210,10 @@ export function MapScreen() {
           </div>
 
           {/* Bottom: team strip + items */}
-          <div className="map-float-footer absolute bottom-3 left-3 right-3 z-10 flex items-end gap-3">
+          <div
+            className="map-float-footer absolute left-3 right-3 z-10 flex items-end gap-3"
+            style={{ bottom: 'max(12px, env(safe-area-inset-bottom, 12px))' }}
+          >
             <TeamBar team={team} onReorder={handleReorder} />
             {items.length > 0 && (
               <ItemBar items={items} onItemClick={handleItemClick} />

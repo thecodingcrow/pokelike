@@ -289,11 +289,11 @@ export function BattleField({
           </div>
         </div>
 
-        {/* Mobile layout: player strip top, enemy strip bottom */}
+        {/* Mobile layout: player strip top, enemy strip bottom — no empty slots */}
         <div className="sm:hidden flex flex-col gap-2">
-          {/* Player strip */}
+          {/* Player strip — only real pokemon */}
           <div className="flex gap-1.5 overflow-x-auto justify-center">
-            {playerSlots.map((mon, i) => (
+            {playerTeam.map((mon, i) => (
               <RosterSlot
                 key={i}
                 pokemon={mon}
@@ -304,9 +304,9 @@ export function BattleField({
           </div>
           {/* Divider */}
           <div className="text-center" style={{ color: '#d97706', fontSize: 10 }}>⚔ VS ⚔</div>
-          {/* Enemy strip */}
+          {/* Enemy strip — only real pokemon */}
           <div className="flex gap-1.5 overflow-x-auto justify-center">
-            {enemySlots.map((mon, i) => (
+            {enemyTeam.map((mon, i) => (
               <RosterSlot
                 key={i}
                 pokemon={mon}

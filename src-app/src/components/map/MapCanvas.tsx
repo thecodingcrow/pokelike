@@ -94,12 +94,14 @@ function darkenHex(hex: string, amount = 0.35): string {
 function MapNodeCircle({
   layout,
   isHovered,
+  maxVisitedLayer,
   onMouseEnter,
   onMouseLeave,
   onNodeClick,
 }: {
   layout: NodeLayout;
   isHovered: boolean;
+  maxVisitedLayer: number;
   onMouseEnter: (node: MapNode, e: React.MouseEvent<SVGGElement>) => void;
   onMouseLeave: () => void;
   onNodeClick: (node: MapNode) => void;
@@ -113,22 +115,29 @@ function MapNodeCircle({
 
   const isAccessible = node.accessible && !node.visited;
   const isVisited = node.visited;
+  const isUnreachable = !node.accessible && !node.visited && node.layer <= maxVisitedLayer;
 
   const cursor = isAccessible ? 'cursor-pointer' : 'cursor-default';
 
-  // Chip fill: desaturate for visited, radial gradient id per node
+  // Chip fill: desaturate for visited or unreachable, radial gradient id per node
   const gradientId = `ng-${node.id}`;
-  const baseColor = isVisited ? desaturateHex(rawColor) : rawColor;
+  const baseColor = (isVisited || isUnreachable) ? desaturateHex(rawColor) : rawColor;
   const lightStop = lightenHex(baseColor);
   const darkStop  = darkenHex(baseColor);
 
   // Stroke colours
-  const strokeColor = isHovered ? '#e8c97e' : isAccessible ? '#c8a96e' : 'rgba(200,169,110,0.4)';
+  const strokeColor = isUnreachable
+    ? 'rgba(200,169,110,0.15)'
+    : isHovered
+    ? '#e8c97e'
+    : isAccessible
+    ? '#c8a96e'
+    : 'rgba(200,169,110,0.4)';
   const strokeWidth = isAccessible || isHovered ? 2.5 : 1.5;
   const strokeDash  = isVisited ? '4 2' : undefined;
 
-  // Hover transform applied on the <g>
-  const transform = isHovered
+  // Hover transform applied on the <g> — suppressed for unreachable
+  const transform = isHovered && !isUnreachable
     ? `translate(${cx} ${cy}) scale(1.08) translate(${-cx} ${-cy})`
     : undefined;
 
@@ -136,9 +145,9 @@ function MapNodeCircle({
     <g
       className={cursor}
       transform={transform}
-      style={{ transition: 'transform 150ms ease-out' }}
+      style={{ transition: 'transform 150ms ease-out', opacity: isUnreachable ? 0.25 : 1 }}
       onClick={() => isAccessible && onNodeClick(node)}
-      onMouseEnter={(e) => onMouseEnter(node, e)}
+      onMouseEnter={(e) => !isUnreachable && onMouseEnter(node, e)}
       onMouseLeave={onMouseLeave}
       role={isAccessible ? 'button' : undefined}
       aria-label={label}
@@ -212,7 +221,7 @@ function MapNodeCircle({
           width={(NODE_RADIUS - 3) * 2}
           height={(NODE_RADIUS - 3) * 2}
           preserveAspectRatio="xMidYMid meet"
-          opacity={isVisited ? 0.5 : 1}
+          opacity={isUnreachable ? 0.2 : isVisited ? 0.5 : 1}
           style={{ imageRendering: 'pixelated' }}
           onError={() => setImgError(true)}
         />
@@ -251,6 +260,14 @@ export function MapCanvas({ map, onNodeClick }: MapCanvasProps) {
       })),
     [map.nodes, positions],
   );
+
+  const maxVisitedLayer = useMemo(() => {
+    let max = -1;
+    for (const n of Object.values(map.nodes)) {
+      if (n.visited && n.layer > max) max = n.layer;
+    }
+    return max;
+  }, [map.nodes]);
 
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{
@@ -302,8 +319,24 @@ export function MapCanvas({ map, onNodeClick }: MapCanvasProps) {
 
             const fromNode = map.nodes[edge.from];
             const toNode = map.nodes[edge.to];
-            const isActive =
-              fromNode?.visited && toNode && !toNode.visited;
+
+            // Visited path: both visited, or visited→accessible (frontier)
+            const isVisitedEdge =
+              fromNode?.visited && (toNode?.visited || toNode?.accessible);
+
+            // Unreachable: either endpoint is unreachable (passed-by branch)
+            const fromUnreachable =
+              !fromNode?.accessible && !fromNode?.visited && (fromNode?.layer ?? 0) <= maxVisitedLayer;
+            const toUnreachable =
+              !toNode?.accessible && !toNode?.visited && (toNode?.layer ?? 0) <= maxVisitedLayer;
+            const isUnreachableEdge = fromUnreachable || toUnreachable;
+
+            const stroke = isVisitedEdge
+              ? 'rgba(200,169,110,0.6)'
+              : isUnreachableEdge
+              ? 'rgba(200,169,110,0.06)'
+              : 'rgba(200,169,110,0.12)';
+            const strokeWidth = isVisitedEdge ? 2 : 1;
 
             return (
               <line
@@ -312,8 +345,8 @@ export function MapCanvas({ map, onNodeClick }: MapCanvasProps) {
                 y1={from.cy}
                 x2={to.cx}
                 y2={to.cy}
-                stroke={isActive ? 'rgba(201,136,62,0.45)' : 'rgba(200,169,110,0.12)'}
-                strokeWidth={isActive ? 1.5 : 1}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
               />
             );
           })}
@@ -326,6 +359,7 @@ export function MapCanvas({ map, onNodeClick }: MapCanvasProps) {
               key={layout.node.id}
               layout={layout}
               isHovered={hoveredNodeId === layout.node.id}
+              maxVisitedLayer={maxVisitedLayer}
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
               onNodeClick={onNodeClick}
