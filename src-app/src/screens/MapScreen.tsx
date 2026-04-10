@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { MapNode, Item } from '@/types';
 import { useGameStore } from '@/store/gameStore';
 import { useUIStore } from '@/store/uiStore';
@@ -7,6 +8,7 @@ import { ItemBar } from '@/components/hud/ItemBar';
 import { MapCanvas } from '@/components/map/MapCanvas';
 import { GYM_LEADERS } from '@/data/gymLeaders';
 import { useGame } from '@/hooks/useGame';
+import { PokemonDrawer } from '@/components/ui/PokemonDrawer';
 
 function SettingsIcon() {
   return (
@@ -86,6 +88,8 @@ export function MapScreen() {
   const currentMap = useGameStore((s) => s.currentMap);
   const openModal = useUIStore((s) => s.openModal);
 
+  const [drawerPokemonIdx, setDrawerPokemonIdx] = useState<number | null>(null);
+
   // Reorder support — swap team slots directly via store
   const swapTeamMember = useGameStore((s) => s.swapTeamMember);
   function handleReorder(from: number, to: number) {
@@ -153,7 +157,7 @@ export function MapScreen() {
             <div className="font-terminal text-[10px] text-[#c8a96e]/60 uppercase tracking-widest mb-2">
               Team
             </div>
-            <TeamBar team={team} onReorder={handleReorder} layout="grid" />
+            <TeamBar team={team} onReorder={handleReorder} layout="grid" onPokemonTap={setDrawerPokemonIdx} />
           </div>
 
           {/* Items (if any) */}
@@ -219,13 +223,47 @@ export function MapScreen() {
             className="map-float-footer absolute left-3 right-3 z-10 flex items-end gap-3"
             style={{ bottom: 'max(12px, env(safe-area-inset-bottom, 12px))' }}
           >
-            <TeamBar team={team} onReorder={handleReorder} />
+            <TeamBar team={team} onReorder={handleReorder} onPokemonTap={setDrawerPokemonIdx} />
             {items.length > 0 && (
               <ItemBar items={items} onItemClick={handleItemClick} />
             )}
           </div>
         </div>
       </div>
+
+      <PokemonDrawer
+        pokemon={drawerPokemonIdx !== null ? team[drawerPokemonIdx] ?? null : null}
+        teamIndex={drawerPokemonIdx ?? 0}
+        teamSize={team.length}
+        onClose={() => setDrawerPokemonIdx(null)}
+        onMoveUp={() => {
+          if (drawerPokemonIdx !== null && drawerPokemonIdx > 0) {
+            const a = team[drawerPokemonIdx];
+            const b = team[drawerPokemonIdx - 1];
+            if (a && b) {
+              swapTeamMember(drawerPokemonIdx, b);
+              swapTeamMember(drawerPokemonIdx - 1, a);
+              setDrawerPokemonIdx(drawerPokemonIdx - 1);
+            }
+          }
+        }}
+        onMoveDown={() => {
+          if (drawerPokemonIdx !== null && drawerPokemonIdx < team.length - 1) {
+            const a = team[drawerPokemonIdx];
+            const b = team[drawerPokemonIdx + 1];
+            if (a && b) {
+              swapTeamMember(drawerPokemonIdx, b);
+              swapTeamMember(drawerPokemonIdx + 1, a);
+              setDrawerPokemonIdx(drawerPokemonIdx + 1);
+            }
+          }
+        }}
+        onUnequip={() => {
+          if (drawerPokemonIdx !== null) {
+            useGameStore.getState().unequipItem(drawerPokemonIdx);
+          }
+        }}
+      />
 
       <style>{`
         /* Desktop grid layout at 900px+ */

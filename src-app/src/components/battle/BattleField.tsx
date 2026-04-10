@@ -1,7 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, type RefObject } from 'react';
 import type { PokemonInstance } from '@/types/pokemon';
 import type { DetailedLogEvent } from '@/types/battle';
 import { HpBar } from './HpBar';
+import { BattleCanvas } from './BattleCanvas';
+import type { BattleCanvasHandle } from './BattleCanvas';
 
 interface BattleFieldProps {
   playerTeam: PokemonInstance[];
@@ -13,6 +15,9 @@ interface BattleFieldProps {
   isComplete: boolean;
   onSkip: () => void;
   onContinue: () => void;
+  canvasRef?: RefObject<BattleCanvasHandle | null>;
+  playerSpriteRef?: RefObject<HTMLDivElement | null>;
+  enemySpriteRef?: RefObject<HTMLDivElement | null>;
 }
 
 // ── Roster slot: one Pokémon in the top roster strip ──────────────────────
@@ -175,6 +180,9 @@ export function BattleField({
   isComplete,
   onSkip,
   onContinue,
+  canvasRef,
+  playerSpriteRef,
+  enemySpriteRef,
 }: BattleFieldProps) {
   const playerActive = playerTeam[playerActiveIdx];
   const enemyActive = enemyTeam[enemyActiveIdx];
@@ -206,6 +214,28 @@ export function BattleField({
       return 'Not very effective...';
     return null;
   }, [currentEvent]);
+
+  // Derive flash/enter classes from current event (avoids extra state + re-renders)
+  const playerFlashClass =
+    currentEvent?.type === 'attack' &&
+    currentEvent.targetSide === 'player' &&
+    currentEvent.targetIdx === playerActiveIdx
+      ? (currentEvent.crit ? 'crit-flash' : 'hit-flash')
+      : '';
+  const enemyFlashClass =
+    currentEvent?.type === 'attack' &&
+    currentEvent.targetSide === 'enemy' &&
+    currentEvent.targetIdx === enemyActiveIdx
+      ? (currentEvent.crit ? 'crit-flash' : 'hit-flash')
+      : '';
+  const playerEnterClass =
+    currentEvent?.type === 'send_out' && currentEvent.side === 'player'
+      ? 'sprite-enter-left'
+      : '';
+  const enemyEnterClass =
+    currentEvent?.type === 'send_out' && currentEvent.side === 'enemy'
+      ? 'sprite-enter-right'
+      : '';
 
   const currentMessage = logMessages[logMessages.length - 1]?.text ?? '';
 
@@ -323,15 +353,20 @@ export function BattleField({
         className="flex-1 relative overflow-hidden flex items-center justify-center"
         style={{ background: '#0a0e0b', minHeight: 0 }}
       >
+        {/* Canvas animation overlay */}
+        {canvasRef && <BattleCanvas ref={canvasRef} />}
+
         {/* Active Pokémon sprites face-off */}
         <div className="flex items-center gap-4">
           {/* Player active (left in arena) */}
           <div className="flex flex-col items-center gap-1">
-            <SpotlightSprite
-              pokemon={playerActive}
-              isDamaged={playerDamaged}
-              isFainted={playerFainted}
-            />
+            <div ref={playerSpriteRef} className={[playerFlashClass, playerEnterClass].filter(Boolean).join(' ')}>
+              <SpotlightSprite
+                pokemon={playerActive}
+                isDamaged={playerDamaged}
+                isFainted={playerFainted}
+              />
+            </div>
             <div
               className="font-pixel leading-none"
               style={{ fontSize: 7, color: '#22c55e' }}
@@ -350,11 +385,13 @@ export function BattleField({
 
           {/* Enemy active (right in arena) */}
           <div className="flex flex-col items-center gap-1">
-            <SpotlightSprite
-              pokemon={enemyActive}
-              isDamaged={enemyDamaged}
-              isFainted={enemyFainted}
-            />
+            <div ref={enemySpriteRef} className={[enemyFlashClass, enemyEnterClass].filter(Boolean).join(' ')}>
+              <SpotlightSprite
+                pokemon={enemyActive}
+                isDamaged={enemyDamaged}
+                isFainted={enemyFainted}
+              />
+            </div>
             <div
               className="font-pixel leading-none"
               style={{ fontSize: 7, color: '#ef4444' }}
@@ -383,6 +420,22 @@ export function BattleField({
               }}
             >
               {effectivenessText}
+            </div>
+          </div>
+        )}
+
+        {/* Critical hit popup */}
+        {currentEvent?.type === 'attack' && currentEvent.crit && (
+          <div className="absolute inset-x-0 top-1/3 flex justify-center pointer-events-none z-30 animate-fade-out-800">
+            <div
+              className="font-pixel px-4 py-1"
+              style={{
+                fontSize: 14,
+                color: '#f8d030',
+                textShadow: '2px 2px 0 #050805, 0 0 8px #f8d03088',
+              }}
+            >
+              Critical!
             </div>
           </div>
         )}

@@ -1,4 +1,5 @@
 import { useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
+import { playAttackAnimation } from '@/systems/battle-anim-moves';
 
 export interface BattleCanvasHandle {
   playAnimation(
@@ -36,13 +37,12 @@ export const BattleCanvas = forwardRef<BattleCanvasHandle>((_props, ref) => {
   }, []);
 
   useImperativeHandle(ref, () => ({
-    playAnimation: async (_moveType, _from, _to, _isSpecial, _moveName, _speed) => {
+    playAnimation: async (moveType, from, to, isSpecial, moveName, speed) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
-      // Will be wired to playAttackAnimation in Phase 3
-      // For now, just a placeholder that resolves immediately
+      await playAttackAnimation(ctx, moveType, from, to, isSpecial, moveName, speed);
     },
     getCtx: () => canvasRef.current?.getContext('2d') ?? null,
   }));

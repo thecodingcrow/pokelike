@@ -102,8 +102,8 @@
     --animate-damage-shake: damage-shake 300ms steps(6, end);
     --animate-screen-wipe:  screen-wipe 300ms steps(6, end) forwards;
     --animate-sprite-enter: sprite-enter 200ms steps(4, end) forwards;
-    --animate-crit-flash:   crit-flash 200ms steps(2, end);
-    --animate-hit-flash:    hit-flash 150ms steps(2, end);
+    --animate-crit-flash:   crit-flash 200ms ease-out;
+    --animate-hit-flash:    hit-flash 150ms steps(2);
 }
 
 @keyframes blink {
@@ -124,20 +124,21 @@
     to   { transform: translateX(0); }
 }
 @keyframes sprite-enter-left {
-    from { transform: translateX(-120%); }
-    to   { transform: translateX(0); }
+    from { transform: translateX(-100%) scale(0.5); opacity: 0; }
+    to   { transform: translateX(0) scale(1); opacity: 1; }
 }
 @keyframes sprite-enter-right {
-    from { transform: translateX(120%); }
-    to   { transform: translateX(0); }
+    from { transform: translateX(100%) scale(0.5); opacity: 0; }
+    to   { transform: translateX(0) scale(1); opacity: 1; }
 }
 @keyframes crit-flash {
-    0%, 100% { filter: brightness(1); }
-    50%      { filter: brightness(2.5); }
+    0%   { filter: brightness(1); }
+    30%  { filter: brightness(4) saturate(0); }
+    100% { filter: brightness(1); }
 }
 @keyframes hit-flash {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: 0.3; }
+    0%, 100% { filter: brightness(1); }
+    50%      { filter: brightness(3) saturate(0); }
 }
 
 :root {
@@ -294,16 +295,16 @@
         animation: damage-shake 300ms steps(6, end);
     }
     .sprite-enter-left {
-        animation: sprite-enter-left 200ms steps(4, end) forwards;
+        animation: sprite-enter-left 400ms ease-out forwards;
     }
     .sprite-enter-right {
-        animation: sprite-enter-right 200ms steps(4, end) forwards;
+        animation: sprite-enter-right 400ms ease-out forwards;
     }
     .crit-flash {
-        animation: crit-flash 200ms steps(2, end);
+        animation: crit-flash 200ms ease-out;
     }
     .hit-flash {
-        animation: hit-flash 150ms steps(2, end);
+        animation: hit-flash 150ms steps(2);
     }
 
     /* ── Blink animations ─────────────────────────────────────────────── */
@@ -378,6 +379,16 @@
 @keyframes shiny-pulse {
   0%, 100% { opacity: 0.3; transform: scale(0.95); }
   50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* ── Critical hit fade-out ──────────────────────────────────────────────── */
+.animate-fade-out-800 {
+  animation: fade-out-800 800ms ease-out forwards;
+}
+@keyframes fade-out-800 {
+  0%   { opacity: 1; transform: scale(1) translateY(0); }
+  50%  { opacity: 1; transform: scale(1.1) translateY(-4px); }
+  100% { opacity: 0; transform: scale(0.9) translateY(8px); }
 }
 
 /* ── Reduced motion ─────────────────────────────────────────────────────── */

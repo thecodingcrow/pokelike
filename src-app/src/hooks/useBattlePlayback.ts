@@ -1,6 +1,7 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, type RefObject } from 'react';
 import type { DetailedLogEvent } from '@/types/battle';
 import type { PokemonInstance } from '@/types/pokemon';
+import type { BattleCanvasHandle } from '@/components/battle/BattleCanvas';
 
 interface LogMessage {
   text: string;
@@ -81,6 +82,9 @@ export function useBattlePlayback(
   detailedLog: DetailedLogEvent[],
   pTeam: PokemonInstance[],
   eTeam: PokemonInstance[],
+  canvasRef?: RefObject<BattleCanvasHandle | null>,
+  playerSpriteRef?: RefObject<HTMLDivElement | null>,
+  enemySpriteRef?: RefObject<HTMLDivElement | null>,
 ) {
   const [state, setState] = useState<BattlePlaybackState>({
     currentEventIndex: -1,
@@ -181,6 +185,51 @@ export function useBattlePlayback(
             isComplete: event.type === 'result',
           };
         });
+
+        // Play canvas animation for attack events before the text-reading delay
+        if (
+          event.type === 'attack' &&
+          canvasRef?.current &&
+          playerSpriteRef?.current &&
+          enemySpriteRef?.current
+        ) {
+          const canvas = canvasRef.current;
+          const ctx = canvas.getCtx();
+          if (ctx) {
+            const canvasRect = ctx.canvas.getBoundingClientRect();
+            const playerRect = playerSpriteRef.current.getBoundingClientRect();
+            const enemyRect  = enemySpriteRef.current.getBoundingClientRect();
+
+            const from = event.side === 'player'
+              ? {
+                  x: playerRect.left + playerRect.width  / 2 - canvasRect.left,
+                  y: playerRect.top  + playerRect.height / 2 - canvasRect.top,
+                }
+              : {
+                  x: enemyRect.left + enemyRect.width  / 2 - canvasRect.left,
+                  y: enemyRect.top  + enemyRect.height / 2 - canvasRect.top,
+                };
+
+            const to = event.targetSide === 'player'
+              ? {
+                  x: playerRect.left + playerRect.width  / 2 - canvasRect.left,
+                  y: playerRect.top  + playerRect.height / 2 - canvasRect.top,
+                }
+              : {
+                  x: enemyRect.left + enemyRect.width  / 2 - canvasRect.left,
+                  y: enemyRect.top  + enemyRect.height / 2 - canvasRect.top,
+                };
+
+            await canvas.playAnimation(
+              event.moveType,
+              from,
+              to,
+              event.isSpecial,
+              event.moveName,
+              speedRef.current,
+            );
+          }
+        }
 
         if (delay > 0) {
           await sleep(delay);

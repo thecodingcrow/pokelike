@@ -7,6 +7,7 @@ interface TeamBarProps {
   readonly?: boolean;
   onReorder?: (from: number, to: number) => void;
   layout?: 'strip' | 'grid';
+  onPokemonTap?: (pokemonIdx: number) => void;
 }
 
 function hpDotColor(current: number, max: number): string {
@@ -17,7 +18,7 @@ function hpDotColor(current: number, max: number): string {
   return '#dc2626';
 }
 
-export function TeamBar({ team, readonly: isReadonly = false, onReorder, layout = 'strip' }: TeamBarProps) {
+export function TeamBar({ team, readonly: isReadonly = false, onReorder, layout = 'strip', onPokemonTap }: TeamBarProps) {
   const [hovered, setHovered]       = useState<{ pokemon: PokemonInstance; pokemonIdx: number; anchor: { x: number; y: number } } | null>(null);
   const [dragFrom, setDragFrom]     = useState<number | null>(null);
   const containerRef                 = useRef<HTMLDivElement>(null);
@@ -65,6 +66,7 @@ export function TeamBar({ team, readonly: isReadonly = false, onReorder, layout 
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => handleDrop(i)}
             onMouseEnter={pokemon ? (e) => handleMouseEnter(pokemon, i, e) : undefined}
+            onClick={pokemon && onPokemonTap ? () => onPokemonTap(i) : undefined}
           >
             {pokemon ? (
               <>

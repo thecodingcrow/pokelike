@@ -45,6 +45,7 @@ export function HpBar({ current, max, label, showNumbers = false }: HpBarProps) 
             height: '100%',
             backgroundColor: barColor,
             display: 'block',
+            transition: 'width 250ms linear, background-color 250ms linear',
           }}
         />
       </div>

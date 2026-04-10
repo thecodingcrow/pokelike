@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useGame } from '@/hooks/useGame';
 import { useBattlePlayback } from '@/hooks/useBattlePlayback';
 import { BattleField } from '@/components/battle/BattleField';
+import type { BattleCanvasHandle } from '@/components/battle/BattleCanvas';
 import type { DetailedLogEvent } from '@/types/battle';
 import type { PokemonInstance } from '@/types/pokemon';
 
@@ -37,7 +38,11 @@ export function BattleScreen() {
   const pTeam: PokemonInstance[]        = battleResult?.pTeam ?? [];
   const eTeam: PokemonInstance[]        = battleResult?.eTeam ?? [];
 
-  const playback = useBattlePlayback(detailedLog, pTeam, eTeam);
+  const canvasRef = useRef<BattleCanvasHandle>(null);
+  const playerSpriteRef = useRef<HTMLDivElement>(null);
+  const enemySpriteRef = useRef<HTMLDivElement>(null);
+
+  const playback = useBattlePlayback(detailedLog, pTeam, eTeam, canvasRef, playerSpriteRef, enemySpriteRef);
 
   // Start playback once we have a log to play
   useEffect(() => {
@@ -117,6 +122,9 @@ export function BattleScreen() {
           isComplete={playback.isComplete}
           onSkip={() => { playback.skipAll(); send({ type: 'SKIP' }); }}
           onContinue={() => send({ type: 'CONTINUE' })}
+          canvasRef={canvasRef}
+          playerSpriteRef={playerSpriteRef}
+          enemySpriteRef={enemySpriteRef}
         />
       </div>
     </div>
