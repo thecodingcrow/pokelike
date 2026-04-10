@@ -1,5 +1,8 @@
+import { useState } from 'react';
+import { useGameStore } from '@/store/gameStore';
 import { useUIStore } from '@/store/uiStore';
 import { usePersistenceStore } from '@/store/persistenceStore';
+import { useGame } from '@/hooks/useGame';
 import type { GameSettings } from '@/types/game';
 import { PixelButton } from '@/components/ui/PixelButton';
 
@@ -34,9 +37,12 @@ function PixelToggle({ label, value, onToggle }: ToggleRowProps) {
 }
 
 export function SettingsModal() {
+  const { send } = useGame();
   const closeModal     = useUIStore((s) => s.closeModal);
+  const hasActiveRun   = useGameStore((s) => s.team.length > 0 && s.map !== null);
   const settings       = usePersistenceStore((s) => s.settings);
   const updateSettings = usePersistenceStore((s) => s.updateSettings);
+  const [confirmGiveUp, setConfirmGiveUp] = useState(false);
 
   function toggle(key: keyof GameSettings) {
     updateSettings({ [key]: !settings[key] });
@@ -66,6 +72,48 @@ export function SettingsModal() {
             onToggle={() => toggle('autoSkipAllBattles')}
           />
         </div>
+
+        {/* Give Up */}
+        {hasActiveRun && (
+          <div className="mb-4 border-t border-[#c8a96e]/20 pt-4">
+            {!confirmGiveUp ? (
+              <PixelButton
+                variant="ghost"
+                onClick={() => setConfirmGiveUp(true)}
+                className="w-full"
+                style={{ color: '#ef4444', borderColor: '#ef444440' }}
+              >
+                GIVE UP RUN
+              </PixelButton>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <span className="font-terminal text-[18px] text-[#ef4444] text-center">
+                  Abandon this run? All progress will be lost.
+                </span>
+                <div className="flex gap-2">
+                  <PixelButton
+                    variant="ghost"
+                    onClick={() => setConfirmGiveUp(false)}
+                    className="flex-1"
+                  >
+                    CANCEL
+                  </PixelButton>
+                  <PixelButton
+                    variant="primary"
+                    onClick={() => {
+                      closeModal();
+                      send({ type: 'RESTART' });
+                    }}
+                    className="flex-1"
+                    style={{ background: '#7f1d1d', borderColor: '#ef4444' }}
+                  >
+                    CONFIRM
+                  </PixelButton>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Close */}
         <PixelButton variant="secondary" onClick={closeModal} className="w-full">

@@ -292,8 +292,8 @@ export const gameMachine = setup({
     }),
 
     resetRunAction: ({ event }: { event: MachineEvents }) => {
-      if (event.type !== 'START_RUN') return;
-      useGameStore.getState().resetRun(event.hardMode ?? false);
+      const hardMode = event.type === 'START_RUN' ? (event.hardMode ?? false) : false;
+      useGameStore.getState().resetRun(hardMode);
     },
 
     setTrainerAction: ({ event }: { event: MachineEvents }) => {
@@ -629,6 +629,10 @@ export const gameMachine = setup({
   on: {
     OPEN_MODAL:  { actions: 'openModalAction' },
     CLOSE_MODAL: { actions: 'closeModalAction' },
+    RESTART: {
+      target: '.title',
+      actions: 'resetRunAction',
+    },
   },
 
   states: {
@@ -951,24 +955,10 @@ export const gameMachine = setup({
     },
 
     // ── Game over ─────────────────────────────────────────────────────────────
-    gameOver: {
-      on: {
-        RESTART: {
-          target: 'title',
-          actions: 'resetRunAction',
-        },
-      },
-    },
+    gameOver: {},
 
     // ── Win screen ────────────────────────────────────────────────────────────
-    win: {
-      on: {
-        RESTART: {
-          target: 'title',
-          actions: 'resetRunAction',
-        },
-      },
-    },
+    win: {},
   },
 });
 
